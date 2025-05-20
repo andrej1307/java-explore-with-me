@@ -18,7 +18,7 @@ import java.util.List;
 
 @Repository
 public class StatDbStorage implements StatStorage {
-    public static final DateTimeFormatter DATA_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DATA_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final String SQL_INSERT_HIT = """
             INSERT INTO endpointhits (app, uri, ip, timestamp)
             VALUES ( :app, :uri, :ip, :timestamp)

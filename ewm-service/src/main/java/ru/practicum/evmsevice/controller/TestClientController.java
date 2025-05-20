@@ -5,25 +5,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.statclient.StatClient;
+import ru.practicum.evmsevice.client.StatsClient;
 import ru.practicum.statdto.HitDto;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Класс для проверки работы клиента сервера посещений
+ */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping
 public class TestClientController {
-
-    private StatClient statClient;
+    private final StatsClient statsClient;
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
     public void hit(@RequestBody HitDto dto) {
         log.info("Поступила информация о посещении : " + dto.toString());
-        statClient.post(dto);
+        statsClient.post(dto);
     }
 
     @GetMapping("/stats")
@@ -42,7 +44,7 @@ public class TestClientController {
         if (uris != null) parameters.put("uris", uris);
         if (unique != null) parameters.put("unique", unique);
         if (size != null) parameters.put("size", size);
-        ResponseEntity<Object> response = statClient.get(parameters);
+        ResponseEntity<Object> response = statsClient.get(parameters);
         return response;
     }
 }
