@@ -1,2 +1,2 @@
 # java-explore-with-me
-Template repository for ExploreWithMe project.
+Итоговый проект учебного курса. май 2025. гр. 53.
