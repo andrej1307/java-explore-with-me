@@ -3,7 +3,6 @@ package ru.practicum.statclient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -37,8 +36,10 @@ public class BaseClient {
      * @param <T>        - тип объекта тела запроса
      * @return - ResponseEntity
      */
-    protected <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
-                                                            @Nullable Map<String, Object> parameters, @Nullable T body) {
+    protected <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method,
+                                                            String path,
+                                                            Map<String, Object> parameters,
+                                                            T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body);
         ResponseEntity<Object> serverResponse;
         try {
