@@ -37,7 +37,8 @@ public class BaseClient {
      * @param <T>        - тип объекта тела запроса
      * @return - ResponseEntity
      */
-    protected <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body) {
+    protected <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
+                                                            @Nullable Map<String, Object> parameters, @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body);
         ResponseEntity<Object> serverResponse;
         try {
@@ -45,7 +46,10 @@ public class BaseClient {
                 StringBuilder stringParametrs = new StringBuilder(path);
                 stringParametrs.append("?");
                 for (String key : parameters.keySet()) {
-                    stringParametrs.append(key + "={" + key + "}&");
+                    stringParametrs.append(key);
+                    stringParametrs.append("={");
+                    stringParametrs.append(key);
+                    stringParametrs.append("}&");
                 }
                 serverResponse = rest.exchange(stringParametrs.toString(), method, requestEntity, Object.class, parameters);
             } else {

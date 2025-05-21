@@ -19,7 +19,7 @@ public class StatsClient extends BaseClient {
     private static final String PREFIX_STATS = "/stats";
 
     @Autowired
-    public StatsClient(@Value("${stat-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatsClient(@Value("${statserver.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
