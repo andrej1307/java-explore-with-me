@@ -1,5 +1,6 @@
 package ru.practicum.evmsevice.client;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -11,6 +12,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.statclient.BaseClient;
 import ru.practicum.statdto.HitDto;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Component
@@ -34,5 +36,14 @@ public class StatsClient extends BaseClient {
 
     public ResponseEntity<Object> get(Map<String, Object> parameters) {
         return makeAndSendRequest(HttpMethod.GET, PREFIX_STATS, parameters, null);
+    }
+
+    public void hitInfo(String appName, HttpServletRequest request) {
+        HitDto hitDto = new HitDto();
+        hitDto.setApp(appName);
+        hitDto.setUri(request.getRequestURI());
+        hitDto.setIp(request.getRemoteAddr());
+        hitDto.setTimestamp(LocalDateTime.now());
+        post(hitDto);
     }
 }
