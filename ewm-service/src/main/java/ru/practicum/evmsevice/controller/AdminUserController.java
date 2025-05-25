@@ -29,7 +29,6 @@ import java.util.List;
 public class AdminUserController {
     @Value("${spring.application.name}")
     private String appName;
-    private static final DateTimeFormatter DATA_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final StatsClient statsClient;
     private final AdminUserService adminUserService;
 
