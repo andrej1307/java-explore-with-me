@@ -1,15 +1,13 @@
 package ru.practicum.evmsevice.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class UserShortDto {
     private Integer id;
     @NotBlank(message = "Имя не может быть пустым")

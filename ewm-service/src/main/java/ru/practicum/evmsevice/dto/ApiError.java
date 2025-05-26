@@ -1,6 +1,7 @@
 package ru.practicum.evmsevice.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +18,8 @@ public class ApiError {
     private HttpStatus status;
     private String reason;
     private String message;
-    private LocalDateTime timestamp;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime timestamp;
+    @JsonIgnore
     private List<String> errors = new ArrayList<>();
 }
