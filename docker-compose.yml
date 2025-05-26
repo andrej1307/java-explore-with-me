@@ -1,10 +1,11 @@
-version: '3.1'
 services:
   stats-db:
     image: postgres:16.1
     container_name: postgres-stat
     ports:
       - "5432:5432"
+    volumes:
+      - ./volumes/stat/postgres:/var/lib/postgresql/data/
     environment:
       - POSTGRES_PASSWORD=statdb
       - POSTGRES_USER=statdb
@@ -44,7 +45,9 @@ services:
     image: postgres:16.1
     container_name: postgres-ewm
     ports:
-      - "5434:5434"
+      - "5434:5432"
+    volumes:
+      - ./volumes/ewm/postgres:/var/lib/postgresql/data/
     environment:
       - POSTGRES_PASSWORD=ewmdb
       - POSTGRES_USER=ewmdb
