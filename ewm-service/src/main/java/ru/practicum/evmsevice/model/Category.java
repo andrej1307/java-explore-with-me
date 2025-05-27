@@ -7,7 +7,7 @@ import lombok.*;
 @Entity
 @Setter
 @Getter
-@Table(name = "category", schema = "public")
+@Table(name = "categories", schema = "public")
 @EqualsAndHashCode(of = {"name"})
 @NoArgsConstructor
 public class Category {

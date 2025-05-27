@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.evmsevice.client.StatsClient;
+import ru.practicum.evmsevice.dto.CategoryDto;
+import ru.practicum.evmsevice.dto.NewCategoryDto;
+import ru.practicum.evmsevice.mapper.CategoryMapper;
 import ru.practicum.evmsevice.model.Category;
 import ru.practicum.evmsevice.service.AdminCategoryService;
 
@@ -23,24 +26,25 @@ public class AdminCategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Category createCategory(@Validated @RequestBody Category category,
-                                    HttpServletRequest request) {
-        log.info("Создаем категорию {}.", category.getName());
+    public CategoryDto createCategory(@Validated @RequestBody NewCategoryDto categoryDto,
+                                      HttpServletRequest request) {
+        log.info("Создаем категорию {}.", categoryDto.getName());
         statsClient.hitInfo(appName, request);
-        Category newCategory = adminCategoryService.createCategory(category);
-        return newCategory;
+        Category newCategory = adminCategoryService.createCategory(CategoryMapper.toCategory(categoryDto));
+        return CategoryMapper.toDto(newCategory);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Category updateCategory(@Validated @RequestBody Category category,
+    public CategoryDto updateCategory(@Validated @RequestBody NewCategoryDto categoryDto,
                                    @PathVariable int id,
                                    HttpServletRequest request) {
         log.info("Обновляем категорию id={}.", id);
         statsClient.hitInfo(appName, request);
+        Category category = CategoryMapper.toCategory(categoryDto);
         category.setId(id);
         Category updatedCategory = adminCategoryService.updateCategory(category);
-        return updatedCategory;
+        return CategoryMapper.toDto(updatedCategory);
     }
 
     @DeleteMapping("/{id}")
