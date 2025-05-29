@@ -24,7 +24,7 @@ public class Event {
     @Column(name = "confirmedrequests")
     private Integer confirmedRequests;
     @Column(name = "createdon", nullable = false)
-    private LocalDateTime createdon;
+    private LocalDateTime createdOn;
     @Column(name = "description")
     private String description;
     @Column(name = "eventdate", nullable = false)
