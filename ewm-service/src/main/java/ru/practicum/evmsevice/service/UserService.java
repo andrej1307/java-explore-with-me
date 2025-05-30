@@ -4,7 +4,7 @@ import ru.practicum.evmsevice.model.User;
 
 import java.util.List;
 
-public interface AdminUserService {
+public interface UserService {
     List<User> getUsers();
 
     User getUserById(Integer id);

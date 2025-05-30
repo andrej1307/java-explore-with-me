@@ -10,7 +10,7 @@ import ru.practicum.evmsevice.repository.CategoryRepository;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AdminCategoryServiceImpl implements AdminCategoryService {
+public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
@@ -32,5 +32,12 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Не найдена категория id=" + id));
         categoryRepository.deleteById(id);
+    }
+
+    @Override
+    public Category getCategoryById(Integer id) {
+        Category category = categoryRepository.findCategoryById(id)
+                .orElseThrow(() -> new NotFoundException("Не найдена категория id=" + id));
+        return category;
     }
 }

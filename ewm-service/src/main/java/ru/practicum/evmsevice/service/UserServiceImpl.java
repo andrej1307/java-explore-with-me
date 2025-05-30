@@ -8,10 +8,10 @@ import ru.practicum.evmsevice.repository.UserRepository;
 import java.util.List;
 
 @Service
-public class AdminUserServiceImpl implements AdminUserService {
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
-    public AdminUserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
