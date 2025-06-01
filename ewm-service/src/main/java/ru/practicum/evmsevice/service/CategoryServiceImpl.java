@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category getCategoryById(Integer id) {
-        Category category = categoryRepository.findCategoryById(id)
+        Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Не найдена категория id=" + id));
         return category;
     }

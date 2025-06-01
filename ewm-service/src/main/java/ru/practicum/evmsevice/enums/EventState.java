@@ -1,11 +1,12 @@
-package ru.practicum.evmsevice.model;
+package ru.practicum.evmsevice.enums;
 
 import java.util.Optional;
 
 public enum EventState {
     PENDING,
     PUBLISHED,
-    CANCELED;
+    CANCELED,
+    REJECTED;
 
     public static Optional<EventState> from(String state) {
         for (EventState eventState : EventState.values()) {

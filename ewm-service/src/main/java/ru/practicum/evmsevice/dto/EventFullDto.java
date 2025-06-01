@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.evmsevice.enums.EventState;
 import ru.practicum.evmsevice.model.Location;
 
 import java.time.LocalDateTime;
@@ -29,7 +30,7 @@ public class EventFullDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
-    private String state;
+    private EventState state;
     @Size(min = 3, max = 120, message = "длина заголовка 3 - 120 символов.")
     private String title;
     private Integer views;

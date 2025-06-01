@@ -4,7 +4,7 @@ import ru.practicum.evmsevice.dto.EventFullDto;
 import ru.practicum.evmsevice.dto.EventShortDto;
 import ru.practicum.evmsevice.dto.NewEventDto;
 import ru.practicum.evmsevice.model.Event;
-import ru.practicum.evmsevice.model.EventState;
+import ru.practicum.evmsevice.enums.EventState;
 import ru.practicum.evmsevice.model.Location;
 
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ public class EventMapper {
         event.setPaid(newDto.getPaid());
         event.setParticipantLimit(newDto.getParticipantLimit());
         event.setRequestModeration(newDto.getRequestModeration());
-        event.setState(EventState.PENDING.name());
+        event.setState(EventState.PENDING);
         event.setTitle(newDto.getTitle());
         return event;
     }

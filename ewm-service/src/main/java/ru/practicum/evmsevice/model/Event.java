@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import ru.practicum.evmsevice.enums.EventState;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Setter
 @Getter
-@Table(name = "eventss", schema = "public")
+@Table(name = "events", schema = "public")
 @NoArgsConstructor
 public class Event {
     @Id
@@ -30,7 +31,7 @@ public class Event {
     @Column(name = "eventdate", nullable = false)
     private LocalDateTime eventDate;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "initiator_id")
     private User initiator;
     @Column(name = "lat")
     private Float lat;
@@ -45,7 +46,8 @@ public class Event {
     @Column(name = "requestmoderation")
     private Boolean requestModeration;
     @Column(name = "state")
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private EventState state;
     @Column(name = "title")
     private String title;
 }

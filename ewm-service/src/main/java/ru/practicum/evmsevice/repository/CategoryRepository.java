@@ -6,5 +6,4 @@ import ru.practicum.evmsevice.model.Category;
 import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
-    Optional<Category> findCategoryById(int id);
 }
