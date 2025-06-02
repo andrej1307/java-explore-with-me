@@ -59,6 +59,18 @@ import java.util.List;
         return eventService.patchEvent(eventId, eventDto, userId);
     }
 
+    @GetMapping("/{userId}/events/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    public List<RequestDto> findRequestsByEventId(@PathVariable int userId,
+                                                  @PathVariable int eventId) {
+        log.info("Пользователь id={} выполняет поиск запросов на участие в событии id={}.",
+                userId, eventId);
+        return requestService.getRequestsByEventId(userId, eventId)
+                .stream()
+                .map(RequestMapper::toRequestDto)
+                .toList();
+    }
+
     @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public RequestDto createRequet(@PathVariable Integer userId,

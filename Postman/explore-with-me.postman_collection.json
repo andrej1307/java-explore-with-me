@@ -401,6 +401,60 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "Get request by event",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/users/3/events2/reqests",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "users",
+                    "3",
+                    "events2",
+                    "reqests"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Patch requests",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"requestIds\": [\r\n    1,\r\n    2,\r\n    3\r\n  ],\r\n  \"status\": \"CONFIRMED\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8080/users/1/events/2/requests",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "users",
+                    "1",
+                    "events",
+                    "2",
+                    "requests"
+                  ]
+                }
+              },
+              "response": []
             }
           ]
         },
@@ -429,6 +483,50 @@
                       "key": "eventId",
                       "value": "8"
                     }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get requests",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/users/2/requests",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "users",
+                    "2",
+                    "requests"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete request",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/users/3/requests/4/cancel",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "users",
+                    "3",
+                    "requests",
+                    "4",
+                    "cancel"
                   ]
                 }
               },

@@ -11,4 +11,7 @@ public interface RequestService {
     List<Request> getRequestsByUserId(Integer userId);
 
     Request deleteRequest(Integer userId, Integer requestId);
+
+    List<Request> getRequestsByEventId(Integer userId, Integer eventId);
+
 }

@@ -38,31 +38,32 @@ public class RequestServiceImpl implements RequestService {
                     "Value: " + event.getState()
             );
         }
-        if (event.getConfirmedRequests().equals(event.getParticipantLimit())) {
-            throw new ValidationException(
+        Integer confirmedRequests = event.getConfirmedRequests();
+        if (confirmedRequests != null) {
+            if(confirmedRequests.equals(event.getParticipantLimit())){
+                throw new ValidationException(
                     "Field: event.state. Error: " +
-                    "У события достигнут лимит запросов на участие. " +
-                    "Value: " + event.getConfirmedRequests()
-            );
+                            "У события достигнут лимит запросов на участие. " +
+                            "Value: " + confirmedRequests
+                );
+            }
         }
         Request request = new Request();
         User user = userService.getUserById(userId);
         request.setRequester(user);
         request.setEvent(event);
-        if (event.getRequestModeration()) {
-            request.setStatus(RequestStatus.PENDING);
-        } else {
+        request.setStatus(RequestStatus.PENDING);
+        if (!event.getRequestModeration()) {
             request.setStatus(RequestStatus.APPROVED);
+            event.setConfirmedRequests(confirmedRequests + 1);
         }
         request.setCreated(LocalDateTime.now());
-        Request savedRequest = requestRepository.save(request);
-        return savedRequest;
+        return requestRepository.save(request);
     }
 
     @Override
     public List<Request> getRequestsByUserId(Integer userId) {
-        List<Request> requests = requestRepository.findAllByRequester_Id(userId);
-        return requests;
+        return requestRepository.findAllByRequester_Id(userId);
     }
 
     @Override
@@ -72,12 +73,25 @@ public class RequestServiceImpl implements RequestService {
                         new NotFoundException("Не найден запрос id=" + requestId));
         if (!request.getRequester().getId().equals(userId)) {
             throw new ValidationException(
-                    "Field: request.requestor.id. Error: " +
+                    "Field: request.requester.id. Error: " +
                             "Нельзя удалить чужой запрос. " +
                             "Value: " + request.getRequester().getId()
             );
         }
         requestRepository.delete(request);
         return request;
+    }
+
+    @Override
+    public List<Request> getRequestsByEventId(Integer userId, Integer eventId) {
+        Event event = eventService.findEventById(eventId);
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new ValidationException(
+                    "Field: event.initiator_id. " +
+                            "Error: пользователь id=" + userId + " не является инициатором события id=" + eventId +
+                            ". Value: " + event.getInitiator().getId()
+            );
+        }
+        return requestRepository.findAllByEvent_Id(eventId);
     }
 }

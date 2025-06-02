@@ -20,9 +20,17 @@ public class EventMapper {
         event.setCreatedOn(LocalDateTime.now());
         event.setLat(newDto.getLocation().getLat());
         event.setLon(newDto.getLocation().getLon());
-        event.setPaid(newDto.getPaid());
+        if(newDto.getPaid()) {
+            event.setPaid(newDto.getPaid());
+        } else {
+            event.setPaid(false);
+        }
         event.setParticipantLimit(newDto.getParticipantLimit());
-        event.setRequestModeration(newDto.getRequestModeration());
+        if (newDto.getRequestModeration() != null) {
+            event.setRequestModeration(newDto.getRequestModeration());
+        } else {
+            event.setRequestModeration(false);
+        }
         event.setState(EventState.PENDING);
         event.setTitle(newDto.getTitle());
         return event;

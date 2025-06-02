@@ -9,5 +9,7 @@ import java.util.List;
 public interface RequestRepository extends JpaRepository<Request,Integer> {
     List<Request> findAllByRequester_Id(int userId);
 
+    List<Request> findAllByEvent_Id(int eventId);
+
     // Integer countByEvent_IdAAndStatusEquals(int eventId, RequestStatus status);
 }
