@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -12,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class RequestGroupDto {
-    List<RequestDto> confirmedRequests;
-    List<RequestDto> rejectedRequests;
+    List<RequestDto> confirmedRequests = new ArrayList<>();
+    List<RequestDto> rejectedRequests = new ArrayList<>();
 }
