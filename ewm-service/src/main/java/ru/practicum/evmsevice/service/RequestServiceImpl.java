@@ -3,10 +3,12 @@ package ru.practicum.evmsevice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.evmsevice.dto.RequestGroupDto;
 import ru.practicum.evmsevice.enums.EventState;
 import ru.practicum.evmsevice.enums.RequestStatus;
 import ru.practicum.evmsevice.exception.NotFoundException;
 import ru.practicum.evmsevice.exception.ValidationException;
+import ru.practicum.evmsevice.mapper.RequestMapper;
 import ru.practicum.evmsevice.model.*;
 import ru.practicum.evmsevice.repository.RequestRepository;
 
@@ -54,7 +56,7 @@ public class RequestServiceImpl implements RequestService {
         request.setEvent(event);
         request.setStatus(RequestStatus.PENDING);
         if (!event.getRequestModeration()) {
-            request.setStatus(RequestStatus.APPROVED);
+            request.setStatus(RequestStatus.CONFIRMED);
             event.setConfirmedRequests(confirmedRequests + 1);
         }
         request.setCreated(LocalDateTime.now());
@@ -93,5 +95,52 @@ public class RequestServiceImpl implements RequestService {
             );
         }
         return requestRepository.findAllByEvent_Id(eventId);
+    }
+
+    @Override
+    public RequestGroupDto updateRequestsStatus(Integer eventId, List<Integer> requestIds, RequestStatus status) {
+        if (requestIds.size() == 0) {
+            throw new ValidationException(
+                    "Field: requestIds.size. " +
+                            "Error: список идентификаторов запроса пустой. " +
+                    "Value: " + requestIds.size()
+            );
+        }
+        Event event = eventService.findEventById(eventId);
+        if (event.getRequestModeration() || (event.getParticipantLimit() != null)) {
+            if(event.getParticipantLimit().equals(event.getConfirmedRequests())) {
+                throw new ValidationException(
+                        "Field: event.confirmedRequests. " +
+                                "Error: Достигнуто максимальное количество заявок для события id=" + eventId +
+                                ". Value: " + event.getInitiator().getId()
+                );
+            }
+        }
+        List<Request> requests = requestRepository.findAllByIdIsIn(requestIds);
+        requestRepository.updateStatus(status, requestIds);
+        // проверякм статус заявок
+        for (Request request : requests) {
+            if(request.getStatus() != RequestStatus.PENDING) {
+                throw new ValidationException(
+                        "Field: requestIds.sstatus. " +
+                                "Error: Невозможно изменить статус запроса id=" + request.getId() +
+                        "Value: " + request.getStatus()
+                );
+            }
+        }
+        RequestGroupDto requestGroupDto = new RequestGroupDto();
+/*        requestGroupDto.setConfirmedRequests(
+                requestRepository.findAllByStatus(RequestStatus.CONFIRMED)
+                        .stream()
+                        .map(RequestMapper::toRequestDto)
+                        .toList()
+        );
+        requestGroupDto.setRejectedRequests(
+                requestRepository.findAllByStatus(RequestStatus.CONFIRMED)
+                        .stream()
+                        .map(RequestMapper::toRequestDto)
+                        .toList()
+        );   */
+        return requestGroupDto;
     }
 }

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public enum RequestStatus {
     PENDING,
-    APPROVED,
+    CONFIRMED,
     REJECTED,
     CANCELED;
 
