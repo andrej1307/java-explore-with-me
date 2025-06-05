@@ -26,6 +26,7 @@ public class NewEventDto
     private String description;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
+    @NotNull(message = "Место события должно быть определено.")
     private Location location;
     private Boolean paid;
     private Integer participantLimit;

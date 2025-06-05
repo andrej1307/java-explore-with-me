@@ -118,85 +118,55 @@ public class RequestServiceImpl implements RequestService {
             );
         }
 
-        if (requestUpdateDto.getRequestIds().isEmpty()) {
+        // ...нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
+        // (Ожидается код ошибки 409)
+        if ((event.getParticipantLimit() > 0)
+                && event.getParticipantLimit().equals(event.getConfirmedRequests())){
             throw new ValidationException(
-                    "Field: requestIds.size. " +
-                            "Error: список идентификаторов запроса пустой. " +
-                            "Value: 0."
-            );
-        }
-
-        if (event.getRequestModeration()
-                || ((event.getParticipantLimit() != null) && (event.getParticipantLimit() > 0))) {
-            if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
-                throw new ValidationException(
                         "Field: event.confirmedRequests. " +
                                 "Error: Достигнуто максимальное количество заявок для события id=" + eventId +
-                                ". Value: " + event.getInitiator().getId()
-                );
-            }
+                                ". Value: " + event.getConfirmedRequests()
+            );
         }
+
         RequestGroupDto requestGroupDto = new RequestGroupDto();
-        RequestStatus status = requestUpdateDto.getStatus();
         List<Integer> requestIds = requestUpdateDto.getRequestIds();
-        System.out.printf("==%s\n", requestIds.toString());
-
-        // Если запросы откланены меняем без проверок статус всех запросов
-        if (status == RequestStatus.REJECTED) {
-            requestRepository.updateStatus(status, requestIds);
-            requestGroupDto.setRejectedRequests(
-                    requestRepository.findAllByIdIsIn(requestIds)
-                            .stream()
-                            .map(RequestMapper::toRequestDto)
-                            .toList()
-            );
+        if (requestIds.isEmpty()) {
             return requestGroupDto;
-        }
-
-        Integer participantLimit = 0;
-        if (event.getParticipantLimit() != null) {
-            participantLimit = event.getParticipantLimit();
-        }
-        // Если лимит участников не установлен, то меняем статус у всех сразу
-        if (participantLimit == 0) {
-            requestRepository.updateStatus(status, requestIds);
-            requestGroupDto.setConfirmedRequests(
-                    requestRepository.findAllByIdIsIn(requestIds)
-                            .stream()
-                            .map(RequestMapper::toRequestDto)
-                            .toList()
-            );
-            return requestGroupDto;
-        }
-
-        Integer ConfirmedRequests = 0;
-        if(event.getConfirmedRequests() != null) {
-            ConfirmedRequests = event.getConfirmedRequests();
         }
         Collections.sort(requestIds);
-        for (int i = 0; i < requestIds.size(); i++) {
-            System.out.printf("* i=%d\n", i);
-            Integer requestId = requestIds.get(i);
+        RequestStatus status = requestUpdateDto.getStatus();
+
+        Integer confirmedRequests = 0;
+        if (event.getConfirmedRequests() != null) {
+            confirmedRequests = event.getConfirmedRequests();
+        }
+
+        // Проверяем заявки из списка
+        for (Integer requestId : requestIds) {
             Request request = requestRepository.findById(requestId)
-                    .orElseThrow(() ->
-                            new NotFoundException("Не найден запрос id=" + requestId));
-            if (request.getStatus() != RequestStatus.PENDING) {
+                    .orElseThrow(() -> new NotFoundException("Не наайдена заявка id=" + requestId));
+            // ... статус можно изменить только у заявок, находящихся в состоянии ожидания
+            // (Ожидается код ошибки 409)
+            if (!request.getStatus().equals(RequestStatus.PENDING)) {
                 throw new ValidationException(
-                        "Field: requestIds.status. " +
-                                "Error: Невозможно изменить статус запроса id=" + request.getId() +
-                                "Value: " + request.getStatus()
+                        "Field: request.status. " +
+                                "Error: недопустимый статус заявки id=" + requestId +
+                                ". Value: " + request.getStatus()
                 );
             }
-            if (!event.getConfirmedRequests().equals(event.getParticipantLimit())) {
-                request.setStatus(status);
-                requestRepository.save(request);
-                requestGroupDto.getConfirmedRequests().add(RequestMapper.toRequestDto(request));
-                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            } else {
+            // ... если при подтверждении данной заявки, лимит заявок для события исчерпан,
+            // то все неподтверждённые заявки необходимо отклонить
+            if (confirmedRequests.equals(event.getParticipantLimit())) {
                 status = RequestStatus.REJECTED;
-                request.setStatus(status);
-                requestRepository.save(request);
-                requestGroupDto.getRejectedRequests().add(RequestMapper.toRequestDto(request));
+            }
+            request.setStatus(status);
+            Request savedRequest = requestRepository.save(request);
+            if (savedRequest.getStatus().equals(RequestStatus.CONFIRMED)) {
+                requestGroupDto.getConfirmedRequests().add(RequestMapper.toRequestDto(savedRequest));
+                confirmedRequests++;
+            } else if (savedRequest.getStatus().equals(RequestStatus.REJECTED)) {
+                requestGroupDto.getRejectedRequests().add(RequestMapper.toRequestDto(savedRequest));
             }
         }
         return requestGroupDto;
