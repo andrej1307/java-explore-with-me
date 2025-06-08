@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.evmsevice.dto.ApiError;
+import ru.practicum.evmsevice.exception.DataConflictException;
 import ru.practicum.evmsevice.exception.InternalServerException;
 import ru.practicum.evmsevice.exception.NotFoundException;
 import ru.practicum.evmsevice.exception.ValidationException;
@@ -60,6 +61,19 @@ public class ErrorAdvisor {
         apiError.setTimestamp(LocalDateTime.now());
         return apiError;
     }
+
+    @ExceptionHandler(DataConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError onDataIntegrityViolationException(final DataConflictException e) {
+        log.error("409 {}", e.getMessage());
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.CONFLICT);
+        apiError.setReason("Конфликт данных.");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
+    }
+
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)

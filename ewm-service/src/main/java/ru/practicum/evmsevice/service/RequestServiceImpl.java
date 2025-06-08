@@ -1,12 +1,14 @@
 package ru.practicum.evmsevice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.evmsevice.dto.RequestGroupDto;
 import ru.practicum.evmsevice.dto.RequestUpdateDto;
 import ru.practicum.evmsevice.enums.EventState;
 import ru.practicum.evmsevice.enums.RequestStatus;
+import ru.practicum.evmsevice.exception.DataConflictException;
 import ru.practicum.evmsevice.exception.NotFoundException;
 import ru.practicum.evmsevice.exception.ValidationException;
 import ru.practicum.evmsevice.mapper.RequestMapper;
@@ -122,7 +124,7 @@ public class RequestServiceImpl implements RequestService {
         // (Ожидается код ошибки 409)
         if ((event.getParticipantLimit() > 0)
                 && event.getParticipantLimit().equals(event.getConfirmedRequests())){
-            throw new ValidationException(
+            throw new DataConflictException(
                         "Field: event.confirmedRequests. " +
                                 "Error: Достигнуто максимальное количество заявок для события id=" + eventId +
                                 ". Value: " + event.getConfirmedRequests()
@@ -149,7 +151,7 @@ public class RequestServiceImpl implements RequestService {
             // ... статус можно изменить только у заявок, находящихся в состоянии ожидания
             // (Ожидается код ошибки 409)
             if (!request.getStatus().equals(RequestStatus.PENDING)) {
-                throw new ValidationException(
+                throw new DataConflictException(
                         "Field: request.status. " +
                                 "Error: недопустимый статус заявки id=" + requestId +
                                 ". Value: " + request.getStatus()

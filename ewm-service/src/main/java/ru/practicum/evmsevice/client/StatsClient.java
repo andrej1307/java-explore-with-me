@@ -11,14 +11,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.statclient.BaseClient;
 import ru.practicum.statdto.HitDto;
+import ru.practicum.statdto.StatsDto;
+import ru.practicum.statdto.StatsDtoList;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class StatsClient extends BaseClient {
     private static final String PREFIX_HIT = "/hit";
     private static final String PREFIX_STATS = "/stats";
+    private static final String PREFIX_EVETS = "/events/";
 
     @Autowired
     public StatsClient(@Value("${statserver.url}") String serverUrl, RestTemplateBuilder builder) {
@@ -45,5 +51,15 @@ public class StatsClient extends BaseClient {
         hitDto.setIp(request.getRemoteAddr());
         hitDto.setTimestamp(LocalDateTime.now());
         post(hitDto);
+    }
+
+    public Integer getEventViews(Integer eventId, Boolean unique) {
+        Map<String, Object> parameters = Map.of("uris", PREFIX_EVETS + eventId,
+                "unique", unique);
+        List<StatsDto> dtos = getStatsList(PREFIX_STATS, parameters);
+        if (dtos.isEmpty()) {
+            return 0;
+        }
+        return dtos.get(0).getHits();
     }
 }

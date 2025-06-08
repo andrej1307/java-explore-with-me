@@ -5,7 +5,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import ru.practicum.statdto.StatsDto;
+import ru.practicum.statdto.StatsDtoList;
 
+import java.util.List;
 import java.util.Map;
 
 public class BaseClient {
@@ -52,7 +55,11 @@ public class BaseClient {
                     stringParametrs.append(key);
                     stringParametrs.append("}&");
                 }
-                serverResponse = rest.exchange(stringParametrs.toString(), method, requestEntity, Object.class, parameters);
+                serverResponse = rest.exchange(stringParametrs.toString(),
+                        method,
+                        requestEntity,
+                        Object.class,
+                        parameters);
             } else {
                 serverResponse = rest.exchange(path, method, requestEntity, Object.class);
             }
@@ -60,5 +67,27 @@ public class BaseClient {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
         return prepareClientResponse(serverResponse);
+    }
+
+    protected List<StatsDto> getStatsList(String path,
+                                          Map<String, Object> parameters) {
+        StatsDtoList serverResponse = new StatsDtoList();
+        try {
+            if (parameters != null) {
+                StringBuilder stringParametrs = new StringBuilder(path);
+                stringParametrs.append("?");
+                for (String key : parameters.keySet()) {
+                    stringParametrs.append(key);
+                    stringParametrs.append("={");
+                    stringParametrs.append(key);
+                    stringParametrs.append("}&");
+                }
+                serverResponse = rest.getForObject(stringParametrs.toString(), StatsDtoList.class, parameters);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+        return serverResponse.getStatsDtos();
     }
 }

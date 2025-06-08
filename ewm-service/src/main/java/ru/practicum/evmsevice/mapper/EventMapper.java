@@ -48,6 +48,10 @@ public class EventMapper {
         dto.setInitiator(UserMapper.toUserShortDto(event.getInitiator()));
         dto.setLocation(new Location(event.getLat(), event.getLon()));
         dto.setParticipantLimit(event.getParticipantLimit());
+        dto.setConfirmedRequests(0);
+        if(event.getConfirmedRequests() != null) {
+            dto.setConfirmedRequests(event.getConfirmedRequests());
+        }
         dto.setRequestModeration(event.getRequestModeration());
         dto.setState(event.getState());
         dto.setPaid(event.getPaid());

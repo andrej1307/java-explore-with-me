@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.statdto.HitDto;
 import ru.practicum.statdto.StatsDto;
+import ru.practicum.statdto.StatsDtoList;
 import ru.practicum.statsvc.service.StatService;
 
 import java.util.List;
@@ -27,13 +28,16 @@ public class StatController {
 
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
-    public List<StatsDto> getStats(
+    public StatsDtoList getStats(
             @RequestParam(required = false) String start,
             @RequestParam(required = false) String end,
             @RequestParam(required = false) List<String> uris,
             @RequestParam(defaultValue = "false") Boolean unique,
             @RequestParam(defaultValue = "10") Integer size) {
         log.info("Запрашивается информация о посещении эндпоинта {} с {} до {}.", uris, start, end);
-        return statService.getStats(start, end, uris, unique, size);
+        List<StatsDto> statDtos = statService.getStats(start, end, uris, unique, size);
+        StatsDtoList statsDtoList = new StatsDtoList();
+        statsDtoList.setStatsDtos(statDtos);
+        return statsDtoList;
     }
 }

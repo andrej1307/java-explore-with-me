@@ -3,6 +3,7 @@ package ru.practicum.evmsevice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.evmsevice.client.StatsClient;
 import ru.practicum.evmsevice.dto.*;
 import ru.practicum.evmsevice.enums.EventAdminAction;
 import ru.practicum.evmsevice.enums.EventState;
@@ -14,6 +15,7 @@ import ru.practicum.evmsevice.model.Category;
 import ru.practicum.evmsevice.model.Event;
 import ru.practicum.evmsevice.model.User;
 import ru.practicum.evmsevice.repository.EventRepository;
+import ru.practicum.evmsevice.repository.RequestRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,8 +29,10 @@ public class EventServiceImpl implements EventService{
     private static final Integer HOURS_EVENT_DELAY = 2;
 
     private final EventRepository eventRepository;
+    private final RequestRepository requestRepository;
     private final UserService userService;
     private final CategoryService categoryService;
+    private final StatsClient statsClient;
 
     /**
      * Создание нового события
@@ -56,14 +60,15 @@ public class EventServiceImpl implements EventService{
 
     @Override
     public EventFullDto getEventById(Integer eventId, Integer userId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() ->
-                        new NotFoundException("Не найдено событие id=" + eventId));
+        Event event = findEventById(eventId);
         if (!event.getInitiator().getId().equals(userId)) {
             throw new ValidationException("Пользователь id=" + userId
                     + " не является инициатором события id=" + eventId);
         }
-        return EventMapper.toFullDto(event);
+        event.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
+        EventFullDto eventFullDto = EventMapper.toFullDto(event);
+        eventFullDto.setViews(statsClient.getEventViews(eventId, true));
+        return eventFullDto;
     }
 
     @Override
@@ -215,6 +220,7 @@ public class EventServiceImpl implements EventService{
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() ->
                         new NotFoundException("Не найдено событие id=" + eventId));
+        event.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
         return event;
     }
 }
