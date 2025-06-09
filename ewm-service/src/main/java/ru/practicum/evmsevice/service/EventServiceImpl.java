@@ -1,6 +1,7 @@
 package ru.practicum.evmsevice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.evmsevice.client.StatsClient;
@@ -15,6 +16,7 @@ import ru.practicum.evmsevice.model.Category;
 import ru.practicum.evmsevice.model.Event;
 import ru.practicum.evmsevice.model.User;
 import ru.practicum.evmsevice.repository.EventRepository;
+import ru.practicum.evmsevice.repository.EventSpecification;
 import ru.practicum.evmsevice.repository.RequestRepository;
 
 import java.time.LocalDateTime;
@@ -222,5 +224,32 @@ public class EventServiceImpl implements EventService{
                         new NotFoundException("Не найдено событие id=" + eventId));
         event.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
         return event;
+    }
+
+    /**
+     * поиск событий
+     */
+    @Override
+    public List<EventShortDto> findEventsByParametrs(String text,
+                                                     List<Integer> categories,
+                                                     Boolean paid,
+                                                     String rangeStart,
+                                                     String rangeEnd,
+                                                     Boolean onlyAvailable,
+                                                     String sort,
+                                                     Integer from,
+                                                     Integer size) {
+        Specification<Event> spec = Specification.where(null);
+
+        if (text != null) {
+            spec = spec.and(EventSpecification.annotetionContains(text));
+            spec = spec.or(EventSpecification.descriptionContains(text));
+        }
+        if (categories != null) {
+            spec = spec.and(EventSpecification.categoryIn(categories));
+        }
+
+        List<Event> events = eventRepository.findAll(spec);
+        return events.stream().map(EventMapper::toShortDto).toList();
     }
 }

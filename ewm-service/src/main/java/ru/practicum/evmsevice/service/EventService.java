@@ -17,4 +17,13 @@ public interface EventService {
     EventFullDto adminUpdateEvent(Integer eventId, UpdateEventAdminRequest eventDto);
 
     Event findEventById(Integer eventId);
+
+    List<EventShortDto> findEventsByParametrs(String text,
+                                              List<Integer> categories,
+                                              Boolean paid,
+                                              String rangeStart,
+                                              String rangeEnd,
+                                              Boolean onlyAvailable,
+                                              String sort,
+                                              Integer from, Integer size);
 }
