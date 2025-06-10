@@ -2,6 +2,7 @@ package ru.practicum.evmsevice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.format.datetime.DateFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.evmsevice.client.StatsClient;
@@ -19,8 +20,12 @@ import ru.practicum.evmsevice.repository.EventRepository;
 import ru.practicum.evmsevice.repository.EventSpecification;
 import ru.practicum.evmsevice.repository.RequestRepository;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,6 +33,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService{
     private static final DateTimeFormatter DATA_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DATA_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final Integer HOURS_EVENT_DELAY = 2;
 
     private final EventRepository eventRepository;
@@ -239,17 +245,51 @@ public class EventServiceImpl implements EventService{
                                                      String sort,
                                                      Integer from,
                                                      Integer size) {
-        Specification<Event> spec = Specification.where(null);
 
+
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        try {
+            if (rangeStart != null && !rangeStart.isEmpty()) {
+                startDate = LocalDateTime.parse(rangeStart, DATA_TIME_FORMATTER).toLocalDate();
+            }
+            if (rangeEnd != null && !rangeEnd.isEmpty()) {
+                endDate = LocalDateTime.parse(rangeEnd, DATA_TIME_FORMATTER).toLocalDate();
+            }
+            // если в запросе не указан диапазон дат [rangeStart-rangeEnd],
+            // то нужно выгружать события, которые произойдут позже текущей даты и времени
+            if (startDate != null && endDate != null) {
+                startDate = LocalDate.now();
+            }
+        } catch (DateTimeParseException e) {
+            throw new ValidationException("Некорректный формат времени. " + e.getMessage());
+        }
+
+        Specification<Event> spec = Specification.where(null);
+        // Задаем спецификации для поиска событий
+        // ...поиск событий по тексту в аннотации и подробном описании события
         if (text != null) {
             spec = spec.and(EventSpecification.annotetionContains(text));
             spec = spec.or(EventSpecification.descriptionContains(text));
         }
+        // ... поиск по списку идентификаторов категорй
         if (categories != null) {
             spec = spec.and(EventSpecification.categoryIn(categories));
         }
-
+        // ... поиск платных или бесплатных событий
+        if (paid != null) {
+            spec = spec.and(EventSpecification.paidEqual(paid));
+        }
+        // Поиск по date события
+ /*       if (startDate != null) {
+            spec = spec.and(EventSpecification.eventDateAfter(startDate));
+        }
+        if (endDate != null) {
+            spec = spec.and(EventSpecification.eventDateBefore(endDate));
+        }
+*/
         List<Event> events = eventRepository.findAll(spec);
+
         return events.stream().map(EventMapper::toShortDto).toList();
     }
 }
