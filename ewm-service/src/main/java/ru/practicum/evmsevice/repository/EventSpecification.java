@@ -29,12 +29,12 @@ public class EventSpecification {
                 criteriaBuilder.equal(root.get("paid"), paid));
     }
 
-    public static Specification<Event> eventDateAfter(LocalDate startDate) {
+    public static Specification<Event> eventDateAfter(LocalDateTime startDate) {
         return ((root, query, criteriaBuilder) ->
                 criteriaBuilder.greaterThanOrEqualTo(root.get("eventDate"), startDate));
     }
 
-    public static Specification<Event> eventDateBefore(LocalDate endDate) {
+    public static Specification<Event> eventDateBefore(LocalDateTime endDate) {
         return ((root, query, criteriaBuilder) ->
                 criteriaBuilder.lessThan(root.get("eventDate"), endDate));
     }

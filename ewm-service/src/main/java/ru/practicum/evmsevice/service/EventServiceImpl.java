@@ -1,6 +1,7 @@
 package ru.practicum.evmsevice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.datetime.DateFormatter;
 import org.springframework.stereotype.Service;
@@ -15,18 +16,19 @@ import ru.practicum.evmsevice.exception.ValidationException;
 import ru.practicum.evmsevice.mapper.EventMapper;
 import ru.practicum.evmsevice.model.Category;
 import ru.practicum.evmsevice.model.Event;
+import ru.practicum.evmsevice.model.EventConfirmedRequestCount;
 import ru.practicum.evmsevice.model.User;
 import ru.practicum.evmsevice.repository.EventRepository;
 import ru.practicum.evmsevice.repository.EventSpecification;
 import ru.practicum.evmsevice.repository.RequestRepository;
+import ru.practicum.statdto.StatsDto;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional
@@ -247,19 +249,19 @@ public class EventServiceImpl implements EventService{
                                                      Integer size) {
 
 
-        LocalDate startDate = null;
-        LocalDate endDate = null;
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
         try {
             if (rangeStart != null && !rangeStart.isEmpty()) {
-                startDate = LocalDateTime.parse(rangeStart, DATA_TIME_FORMATTER).toLocalDate();
+                startDate = LocalDateTime.parse(rangeStart, DATA_TIME_FORMATTER);
             }
             if (rangeEnd != null && !rangeEnd.isEmpty()) {
-                endDate = LocalDateTime.parse(rangeEnd, DATA_TIME_FORMATTER).toLocalDate();
+                endDate = LocalDateTime.parse(rangeEnd, DATA_TIME_FORMATTER);
             }
             // если в запросе не указан диапазон дат [rangeStart-rangeEnd],
             // то нужно выгружать события, которые произойдут позже текущей даты и времени
             if (startDate != null && endDate != null) {
-                startDate = LocalDate.now();
+                startDate = LocalDateTime.now();
             }
         } catch (DateTimeParseException e) {
             throw new ValidationException("Некорректный формат времени. " + e.getMessage());
@@ -281,15 +283,38 @@ public class EventServiceImpl implements EventService{
             spec = spec.and(EventSpecification.paidEqual(paid));
         }
         // Поиск по date события
- /*       if (startDate != null) {
+        if (startDate != null) {
             spec = spec.and(EventSpecification.eventDateAfter(startDate));
         }
         if (endDate != null) {
             spec = spec.and(EventSpecification.eventDateBefore(endDate));
         }
-*/
-        List<Event> events = eventRepository.findAll(spec);
 
-        return events.stream().map(EventMapper::toShortDto).toList();
+        List<Event> events = eventRepository.findAll(spec,
+                Sort.by("eventDate").descending());
+
+        Map<Integer,EventShortDto> eventMap = new HashMap<Integer,EventShortDto>();
+        List<String> eventUris = new ArrayList<>();
+        for (Event event : events) {
+            eventMap.put(event.getId(), EventMapper.toShortDto(event));
+            eventUris.add(String.format("/events/%d", event.getId()));
+        }
+
+        // заполняем количество заявок
+        List<EventConfirmedRequestCount> counts =
+                requestRepository.getCountConfirmedRequests(eventMap.keySet().stream().toList());
+        for(EventConfirmedRequestCount count : counts) {
+            Integer eventId = count.getEventId();
+            eventMap.get(eventId).setConfirmedRequest(count.getConfirmedRequestCount().intValue());
+        }
+
+        // заполняем количество просмотров
+        List<StatsDto> statsDtos = statsClient.getEventViewsByUris(eventUris, true);
+        for (StatsDto dto : statsDtos) {
+            Integer eventId = Integer.parseInt(dto.getUri().split("/")[1]);
+            eventMap.get(eventId).setViews(dto.getHits());
+        }
+
+        return eventMap.values().stream().toList();
     }
 }

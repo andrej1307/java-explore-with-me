@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS events (
     state VARCHAR(32),
     title VARCHAR(128),
     CONSTRAINT pk_event PRIMARY KEY (id),
-    CONSTRAINT fk_events_to_users FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_events_to_users FOREIGN KEY (initiator_id) REFERENCES users (id),
     CONSTRAINT fk_events_to_categories FOREIGN KEY (category_id) REFERENCES categories (id)
 );
 

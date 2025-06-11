@@ -62,4 +62,10 @@ public class StatsClient extends BaseClient {
         }
         return dtos.get(0).getHits();
     }
+
+    public List<StatsDto> getEventViewsByUris(List<String> eventUris, Boolean unique) {
+        Map<String, Object> parameters = Map.of("uris", eventUris,
+                "unique", unique);
+        return getStatsList(PREFIX_STATS, parameters);
+    }
 }
