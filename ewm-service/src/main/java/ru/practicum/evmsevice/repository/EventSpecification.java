@@ -1,6 +1,7 @@
 package ru.practicum.evmsevice.repository;
 
 import org.springframework.data.jpa.domain.Specification;
+import ru.practicum.evmsevice.enums.EventState;
 import ru.practicum.evmsevice.model.Event;
 
 import java.time.LocalDate;
@@ -37,5 +38,15 @@ public class EventSpecification {
     public static Specification<Event> eventDateBefore(LocalDateTime endDate) {
         return ((root, query, criteriaBuilder) ->
                 criteriaBuilder.lessThan(root.get("eventDate"), endDate));
+    }
+
+    public static Specification<Event> eventInitiatorIdIn(List<Integer> initiatorIds) {
+        return ((root, query, criteriaBuilder) ->
+                criteriaBuilder.in(root.join("initiator").get("id")).value(initiatorIds));
+    }
+
+    public static Specification<Event> eventStateIn(List<String> states) {
+        return ((root, query, criteriaBuilder) ->
+                criteriaBuilder.in(root.get("state")).value(states));
     }
 }

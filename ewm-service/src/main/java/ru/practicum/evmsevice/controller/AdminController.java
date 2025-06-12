@@ -102,6 +102,22 @@ public class AdminController {
         categoryService.deleteCategory(id);
     }
 
+    @GetMapping("/events")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventFullDto> findEvents(
+            @RequestParam(name = "users", required = false) List<Integer> users,
+            @RequestParam(name = "states", required = false) List<String> states,
+            @RequestParam(name = "categories", required = false) List<Integer> categories,
+            @RequestParam(name = "rangeStart", required = false) String rangeStart,
+            @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
+            @RequestParam(name = "from", defaultValue = "0") Integer from,
+            @RequestParam(name = "size", defaultValue = "10") Integer size,
+            HttpServletRequest request) {
+        log.info("Администратор запрашивает список событий. users:{}, states:{}, categories:{} rangeStart:{},  rangeStart:{}.",
+                users, states, categories, rangeStart, rangeEnd);
+        return eventService.findEventsByAdmin(states, users, categories, rangeStart, rangeEnd, from, size );
+    }
+
     @PatchMapping("/events/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEvent(@PathVariable Integer eventId,

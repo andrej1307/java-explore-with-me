@@ -1,7 +1,6 @@
 package ru.practicum.evmsevice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.evmsevice.dto.RequestGroupDto;
@@ -46,7 +45,7 @@ public class RequestServiceImpl implements RequestService {
                             "Value: " + event.getState()
             );
         }
-        Integer confirmedRequests = event.getConfirmedRequests();
+        Integer confirmedRequests = requestRepository.getCountConfirmedRequestsByEventId(eventId);
         if (confirmedRequests != null) {
             if (confirmedRequests.equals(event.getParticipantLimit())) {
                 throw new ValidationException(
@@ -63,7 +62,6 @@ public class RequestServiceImpl implements RequestService {
         request.setStatus(RequestStatus.PENDING);
         if (!event.getRequestModeration()) {
             request.setStatus(RequestStatus.CONFIRMED);
-            event.setConfirmedRequests(confirmedRequests + 1);
         }
         request.setCreated(LocalDateTime.now());
         return requestRepository.save(request);
@@ -115,19 +113,20 @@ public class RequestServiceImpl implements RequestService {
         if (!event.getInitiator().getId().equals(userId)) {
             throw new ValidationException(
                     "Field: event.initiator_id. Error: " +
-                        "Пользователь id=" + userId + " не является инициатором события id=" + eventId +
-                        ". Value: " + event.getInitiator().getId()
+                            "Пользователь id=" + userId + " не является инициатором события id=" + eventId +
+                            ". Value: " + event.getInitiator().getId()
             );
         }
 
         // ...нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
         // (Ожидается код ошибки 409)
+        Integer confirmedRequests = requestRepository.getCountConfirmedRequestsByEventId(eventId);
         if ((event.getParticipantLimit() > 0)
-                && event.getParticipantLimit().equals(event.getConfirmedRequests())){
+                && event.getParticipantLimit().equals(confirmedRequests)) {
             throw new DataConflictException(
-                        "Field: event.confirmedRequests. " +
-                                "Error: Достигнуто максимальное количество заявок для события id=" + eventId +
-                                ". Value: " + event.getConfirmedRequests()
+                    "Field: event.confirmedRequests. " +
+                            "Error: Достигнуто максимальное количество заявок для события id=" + eventId +
+                            ". Value: " + confirmedRequests
             );
         }
 
@@ -139,15 +138,10 @@ public class RequestServiceImpl implements RequestService {
         Collections.sort(requestIds);
         RequestStatus status = requestUpdateDto.getStatus();
 
-        Integer confirmedRequests = 0;
-        if (event.getConfirmedRequests() != null) {
-            confirmedRequests = event.getConfirmedRequests();
-        }
-
         // Проверяем заявки из списка
         for (Integer requestId : requestIds) {
             Request request = requestRepository.findById(requestId)
-                    .orElseThrow(() -> new NotFoundException("Не наайдена заявка id=" + requestId));
+                    .orElseThrow(() -> new NotFoundException("Не найдена заявка id=" + requestId));
             // ... статус можно изменить только у заявок, находящихся в состоянии ожидания
             // (Ожидается код ошибки 409)
             if (!request.getStatus().equals(RequestStatus.PENDING)) {

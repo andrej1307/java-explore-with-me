@@ -58,7 +58,7 @@ public class StatDbStorage implements StatStorage {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT app, uri, count(ip) as hits FROM");
         if (unique) {
-            sql.append(" (SELECT DISTINCT ON (ip) app, uri, ip, timestamp FROM endpointhits)");
+            sql.append(" (SELECT DISTINCT ON (ip, uri) app, uri, ip, timestamp FROM endpointhits)");
         } else {
             sql.append(" endpointhits");
         }

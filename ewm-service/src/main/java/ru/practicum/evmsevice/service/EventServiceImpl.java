@@ -75,8 +75,8 @@ public class EventServiceImpl implements EventService{
             throw new ValidationException("Пользователь id=" + userId
                     + " не является инициатором события id=" + eventId);
         }
-        event.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
         EventFullDto eventFullDto = EventMapper.toFullDto(event);
+        eventFullDto.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
         eventFullDto.setViews(statsClient.getEventViews(eventId, true));
         return eventFullDto;
     }
@@ -230,12 +230,11 @@ public class EventServiceImpl implements EventService{
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() ->
                         new NotFoundException("Не найдено событие id=" + eventId));
-        event.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
         return event;
     }
 
     /**
-     * поиск событий
+     * поиск событий пользователем
      */
     @Override
     public List<EventShortDto> findEventsByParametrs(String text,
@@ -293,7 +292,7 @@ public class EventServiceImpl implements EventService{
         List<Event> events = eventRepository.findAll(spec,
                 Sort.by("eventDate").descending());
 
-        Map<Integer,EventShortDto> eventMap = new HashMap<Integer,EventShortDto>();
+        TreeMap<Integer,EventShortDto> eventMap = new TreeMap<Integer,EventShortDto>();
         List<String> eventUris = new ArrayList<>();
         for (Event event : events) {
             eventMap.put(event.getId(), EventMapper.toShortDto(event));
@@ -311,10 +310,110 @@ public class EventServiceImpl implements EventService{
         // заполняем количество просмотров
         List<StatsDto> statsDtos = statsClient.getEventViewsByUris(eventUris, true);
         for (StatsDto dto : statsDtos) {
-            Integer eventId = Integer.parseInt(dto.getUri().split("/")[1]);
+            Integer eventId = Integer.parseInt(dto.getUri().split("/")[2]);
             eventMap.get(eventId).setViews(dto.getHits());
         }
 
-        return eventMap.values().stream().toList();
+        List<EventShortDto> eventDtos = new ArrayList<>();
+        if(onlyAvailable) {
+            // Фильтруем события у котрыз не исчерпано количество заявок
+            eventDtos = eventMap.values()
+                    .stream()
+                    .filter(eventDto -> eventDto.getParticipantLimit() != 0
+                            && eventDto.getConfirmedRequest() < eventDto.getParticipantLimit())
+                    .toList();
+        } else {
+            eventDtos.addAll(eventMap.values());
+        }
+
+        if(sort.equalsIgnoreCase("VIEWS")) {
+            return eventDtos.stream()
+                    .sorted(Comparator.comparing(EventShortDto::getViews))
+                    .skip(from).limit(size).toList();
+        }
+        return eventMap.values().stream().skip(from).limit(size).toList();
+    }
+
+    /**
+     * Поиск событий администратором
+     */
+    @Override
+    public List<EventFullDto> findEventsByAdmin(List<String> states,
+                                                List<Integer> users,
+                                                List<Integer> categories,
+                                                String rangeStart,
+                                                String rangeEnd,
+                                                Integer from,
+                                                Integer size) {
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+        try {
+            if (rangeStart != null && !rangeStart.isEmpty()) {
+                startDate = LocalDateTime.parse(rangeStart, DATA_TIME_FORMATTER);
+            }
+            if (rangeEnd != null && !rangeEnd.isEmpty()) {
+                endDate = LocalDateTime.parse(rangeEnd, DATA_TIME_FORMATTER);
+            }
+            if (startDate != null && endDate != null) {
+                startDate = LocalDateTime.now();
+            }
+        } catch (DateTimeParseException e) {
+            throw new ValidationException("Некорректный формат времени. " + e.getMessage());
+        }
+
+        Specification<Event> spec = Specification.where(null);
+        // Задаем спецификации для поиска событий
+        // ...поиск событий по списку идентификаторов инициаторов
+        if (users != null) {
+            spec = spec.and(EventSpecification.eventInitiatorIdIn(users));
+        }
+        // ... поиск по списку идентификаторов категорй
+        if (categories != null) {
+            spec = spec.and(EventSpecification.categoryIn(categories));
+        }
+        // ... поиск по списку состояний
+        // List<EventState> enumStates = states.stream().map(state -> EventState.valueOf(state)).toList();
+        if (states != null) {
+            spec = spec.and(EventSpecification.eventStateIn(states));
+        }
+        // Поиск по date события
+        if (startDate != null) {
+            spec = spec.and(EventSpecification.eventDateAfter(startDate));
+        }
+        if (endDate != null) {
+            spec = spec.and(EventSpecification.eventDateBefore(endDate));
+        }
+
+        List<Event> events = eventRepository.findAll(spec,
+                Sort.by("eventDate").descending());
+        if (events.isEmpty()) {
+            return List.of();
+        }
+
+        TreeMap<Integer,EventFullDto> eventMap = new TreeMap<Integer,EventFullDto>();
+        List<String> eventUris = new ArrayList<>();
+        for (Event event : events) {
+            eventMap.put(event.getId(), EventMapper.toFullDto(event));
+            eventUris.add(String.format("/events/%d", event.getId()));
+        }
+
+        // заполняем количество заявок
+        List<EventConfirmedRequestCount> counts =
+                requestRepository.getCountConfirmedRequests(eventMap.keySet().stream().toList());
+        for(EventConfirmedRequestCount count : counts) {
+            Integer eventId = count.getEventId();
+            eventMap.get(eventId).setConfirmedRequests(count.getConfirmedRequestCount().intValue());
+        }
+
+        // заполняем количество просмотров
+        List<StatsDto> statsDtos = statsClient.getEventViewsByUris(eventUris, true);
+        for (StatsDto dto : statsDtos) {
+            Integer eventId = Integer.parseInt(dto.getUri().split("/")[2]);
+            eventMap.get(eventId).setViews(dto.getHits());
+        }
+
+        List<EventFullDto> eventDtos = new ArrayList<>();
+        eventDtos.addAll(eventMap.values());
+        return eventDtos.stream().skip(from).limit(size).toList();
     }
 }

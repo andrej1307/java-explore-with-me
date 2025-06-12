@@ -55,7 +55,7 @@ public class PublicController {
                                             @RequestParam(name = "paid", required = false) Boolean paid,
                                             @RequestParam(name = "rangeStart", required = false) String rangeStart,
                                             @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
-                                            @RequestParam(name = "onlyAvailable", defaultValue = "true") Boolean onlyAvailable,
+                                            @RequestParam(name = "onlyAvailable", defaultValue = "false") Boolean onlyAvailable,
                                             @RequestParam(name = "sort", defaultValue = "EVENT_DATE") String sort,
                                             @RequestParam(name = "from", defaultValue = "0") Integer from,
                                             @RequestParam(name = "size", defaultValue = "10") Integer size,

@@ -1,6 +1,7 @@
 package ru.practicum.evmsevice.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,4 +24,7 @@ public class EventShortDto {
     private Boolean paid;
     private String title;
     private Integer views;
+    @JsonIgnore
+    private Integer participantLimit;
+
 }

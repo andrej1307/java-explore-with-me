@@ -47,28 +47,35 @@ public class EventMapper {
         dto.setCategory(CategoryMapper.toDto(event.getCategory()));
         dto.setInitiator(UserMapper.toUserShortDto(event.getInitiator()));
         dto.setLocation(new Location(event.getLat(), event.getLon()));
-        dto.setParticipantLimit(event.getParticipantLimit());
-        dto.setConfirmedRequests(0);
-        if(event.getConfirmedRequests() != null) {
-            dto.setConfirmedRequests(event.getConfirmedRequests());
+        dto.setParticipantLimit(0);
+        if(event.getParticipantLimit() != null) {
+            dto.setParticipantLimit(event.getParticipantLimit());
         }
         dto.setRequestModeration(event.getRequestModeration());
         dto.setState(event.getState());
         dto.setPaid(event.getPaid());
         dto.setPublishedOn(event.getPublishedOn());
         dto.setTitle(event.getTitle());
+        dto.setConfirmedRequests(0);
+        dto.setViews(0);
         return dto;
     }
 
     public static EventShortDto toShortDto(Event event) {
         EventShortDto dto = new EventShortDto();
         dto.setId(event.getId());
+        dto.setTitle(event.getTitle());
         dto.setAnnotation(event.getAnnotation());
         dto.setCategory(CategoryMapper.toDto(event.getCategory()));
         dto.setInitiator(UserMapper.toUserShortDto(event.getInitiator()));
         dto.setEventDate(event.getEventDate());
         dto.setPaid(event.getPaid());
-        dto.setTitle(event.getTitle());
+        dto.setParticipantLimit(0);
+        if(event.getParticipantLimit() != null) {
+            dto.setParticipantLimit(event.getParticipantLimit());
+        }
+        dto.setConfirmedRequest(0);
+        dto.setViews(0);
         return dto;
     }
 }

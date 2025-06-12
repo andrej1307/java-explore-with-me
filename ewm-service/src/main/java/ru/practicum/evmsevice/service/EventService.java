@@ -1,5 +1,6 @@
 package ru.practicum.evmsevice.service;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.evmsevice.dto.*;
 import ru.practicum.evmsevice.model.Event;
 
@@ -26,4 +27,12 @@ public interface EventService {
                                               Boolean onlyAvailable,
                                               String sort,
                                               Integer from, Integer size);
+
+    List<EventFullDto> findEventsByAdmin(List<String> states,
+                                         List<Integer> users,
+                                         List<Integer> categories,
+                                         String rangeStart,
+                                         String rangeEnd,
+                                         Integer from,
+                                         Integer size);
 }
