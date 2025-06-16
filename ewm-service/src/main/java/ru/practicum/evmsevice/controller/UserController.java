@@ -101,6 +101,6 @@ public class UserController {
     public RequestDto canceledRequestById(@PathVariable Integer userId,
                                           @PathVariable Integer requestId) {
         log.info("Пользователь id={} отменяет запрос id={}.", userId, requestId);
-        return RequestMapper.toRequestDto(requestService.CanceledRequest(userId, requestId));
+        return RequestMapper.toRequestDto(requestService.canceledRequest(userId, requestId));
     }
 }
