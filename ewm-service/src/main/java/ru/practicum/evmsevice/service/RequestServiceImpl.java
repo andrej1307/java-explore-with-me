@@ -78,7 +78,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Request CanceledRequest(Integer userId, Integer requestId) {
+    public Request canceledRequest(Integer userId, Integer requestId) {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() ->
                         new NotFoundException("Не найден запрос id=" + requestId));

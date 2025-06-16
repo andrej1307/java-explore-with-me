@@ -12,7 +12,7 @@ public interface RequestService {
 
     List<RequestDto> getRequestsByUserId(Integer userId);
 
-    Request CanceledRequest(Integer userId, Integer requestId);
+    Request canceledRequest(Integer userId, Integer requestId);
 
     List<Request> getRequestsByEventId(Integer userId, Integer eventId);
 
