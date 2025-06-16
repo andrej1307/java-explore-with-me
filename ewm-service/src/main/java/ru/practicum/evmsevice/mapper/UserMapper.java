@@ -5,7 +5,9 @@ import ru.practicum.evmsevice.dto.UserShortDto;
 import ru.practicum.evmsevice.model.User;
 
 public class UserMapper {
-    private UserMapper() {}
+    private UserMapper() {
+    }
+
     public static User toUser(UserDto dto) {
         User user = new User();
         if (dto.getId() != null) {
@@ -15,6 +17,7 @@ public class UserMapper {
         user.setEmail(dto.getEmail());
         return user;
     }
+
     public static UserDto toUserDto(User user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());

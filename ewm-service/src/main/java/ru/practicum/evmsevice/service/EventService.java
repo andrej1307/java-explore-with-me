@@ -1,6 +1,5 @@
 package ru.practicum.evmsevice.service;
 
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.evmsevice.dto.*;
 import ru.practicum.evmsevice.model.Event;
 

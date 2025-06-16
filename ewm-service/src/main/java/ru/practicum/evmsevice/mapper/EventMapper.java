@@ -3,14 +3,15 @@ package ru.practicum.evmsevice.mapper;
 import ru.practicum.evmsevice.dto.EventFullDto;
 import ru.practicum.evmsevice.dto.EventShortDto;
 import ru.practicum.evmsevice.dto.NewEventDto;
-import ru.practicum.evmsevice.model.Event;
 import ru.practicum.evmsevice.enums.EventState;
+import ru.practicum.evmsevice.model.Event;
 import ru.practicum.evmsevice.model.Location;
 
 import java.time.LocalDateTime;
 
 public class EventMapper {
-    private EventMapper() {}
+    private EventMapper() {
+    }
 
     public static Event toEvent(final NewEventDto newDto) {
         Event event = new Event();
@@ -21,11 +22,11 @@ public class EventMapper {
         event.setLat(newDto.getLocation().getLat());
         event.setLon(newDto.getLocation().getLon());
         event.setPaid(false);
-        if(newDto.getPaid() != null) {
+        if (newDto.getPaid() != null) {
             event.setPaid(newDto.getPaid());
         }
         event.setParticipantLimit(0);
-        if(newDto.getParticipantLimit() != null) {
+        if (newDto.getParticipantLimit() != null) {
             event.setParticipantLimit(newDto.getParticipantLimit());
         }
         event.setRequestModeration(true);
@@ -50,7 +51,7 @@ public class EventMapper {
         dto.setInitiator(UserMapper.toUserShortDto(event.getInitiator()));
         dto.setLocation(new Location(event.getLat(), event.getLon()));
         dto.setParticipantLimit(0);
-        if(event.getParticipantLimit() != null) {
+        if (event.getParticipantLimit() != null) {
             dto.setParticipantLimit(event.getParticipantLimit());
         }
         dto.setRequestModeration(event.getRequestModeration());
@@ -63,7 +64,7 @@ public class EventMapper {
             dto.setConfirmedRequests(event.getConfirmedRequests());
         }
         dto.setViews(0);
-        if(event.getViews() != null) {
+        if (event.getViews() != null) {
             dto.setViews(event.getViews());
         }
         return dto;
@@ -79,7 +80,7 @@ public class EventMapper {
         dto.setEventDate(event.getEventDate());
         dto.setPaid(event.getPaid());
         dto.setParticipantLimit(0);
-        if(event.getParticipantLimit() != null) {
+        if (event.getParticipantLimit() != null) {
             dto.setParticipantLimit(event.getParticipantLimit());
         }
         dto.setConfirmedRequests(0);
@@ -87,7 +88,7 @@ public class EventMapper {
             dto.setConfirmedRequests(event.getConfirmedRequests());
         }
         dto.setViews(0);
-        if(event.getViews() != null) {
+        if (event.getViews() != null) {
             dto.setViews(event.getViews());
         }
         return dto;

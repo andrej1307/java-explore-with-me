@@ -1,12 +1,9 @@
 package ru.practicum.evmsevice.repository;
 
 import org.springframework.data.jpa.domain.Specification;
-import ru.practicum.evmsevice.enums.EventState;
 import ru.practicum.evmsevice.model.Event;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 public class EventSpecification {

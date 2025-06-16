@@ -53,7 +53,7 @@ public class UserController {
     public EventFullDto updateEvent(@PathVariable Integer userId,
                                     @PathVariable Integer eventId,
                                     @Validated @RequestBody UpdateEventUserRequest eventDto) {
-        log.info("Пользователь id={} изменяет информацию об инциированном событии. {}" , userId, eventDto.toString());
+        log.info("Пользователь id={} изменяет информацию об инциированном событии. {}", userId, eventDto.toString());
         return eventService.patchEvent(eventId, eventDto, userId);
     }
 
@@ -99,7 +99,7 @@ public class UserController {
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     @ResponseStatus(HttpStatus.OK)
     public RequestDto canceledRequestById(@PathVariable Integer userId,
-                                        @PathVariable Integer requestId) {
+                                          @PathVariable Integer requestId) {
         log.info("Пользователь id={} отменяет запрос id={}.", userId, requestId);
         return RequestMapper.toRequestDto(requestService.CanceledRequest(userId, requestId));
     }

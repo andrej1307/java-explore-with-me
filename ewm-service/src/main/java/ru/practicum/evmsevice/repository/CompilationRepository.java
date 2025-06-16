@@ -5,6 +5,6 @@ import ru.practicum.evmsevice.model.Compilation;
 
 import java.util.List;
 
-public interface CompilationRepository  extends JpaRepository<Compilation, Integer> {
+public interface CompilationRepository extends JpaRepository<Compilation, Integer> {
     List<Compilation> findAllByPinnedEquals(boolean pinned);
 }

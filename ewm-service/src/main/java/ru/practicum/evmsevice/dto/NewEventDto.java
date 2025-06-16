@@ -14,8 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @ToString
-public class NewEventDto
-{
+public class NewEventDto {
     @NotEmpty(message = "Аннотация не может быть пустой.")
     @NotBlank(message = "Аннотация не может быть пустой.")
     @Size(min = 20, max = 2000, message = "длина аннотации 20 - 2000 символов.")

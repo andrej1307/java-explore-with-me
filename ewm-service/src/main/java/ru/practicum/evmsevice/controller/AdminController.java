@@ -12,7 +12,6 @@ import ru.practicum.evmsevice.dto.*;
 import ru.practicum.evmsevice.mapper.CategoryMapper;
 import ru.practicum.evmsevice.mapper.UserMapper;
 import ru.practicum.evmsevice.model.Category;
-import ru.practicum.evmsevice.model.Event;
 import ru.practicum.evmsevice.model.User;
 import ru.practicum.evmsevice.service.CategoryService;
 import ru.practicum.evmsevice.service.CompilationService;
@@ -29,13 +28,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-    @Value("${spring.application.name}")
-    private String appName;
     private final StatsClient statsClient;
     private final UserService userService;
     private final CategoryService categoryService;
     private final EventService eventService;
     private final CompilationService compilationService;
+    @Value("${spring.application.name}")
+    private String appName;
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
@@ -129,7 +128,7 @@ public class AdminController {
             HttpServletRequest request) {
         log.info("Администратор запрашивает список событий. users:{}, states:{}, categories:{} rangeStart:{},  rangeStart:{}.",
                 users, states, categories, rangeStart, rangeEnd);
-        return eventService.findEventsByAdmin(states, users, categories, rangeStart, rangeEnd, from, size );
+        return eventService.findEventsByAdmin(states, users, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/events/{eventId}")

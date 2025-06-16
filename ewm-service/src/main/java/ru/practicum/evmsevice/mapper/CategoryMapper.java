@@ -5,7 +5,8 @@ import ru.practicum.evmsevice.dto.NewCategoryDto;
 import ru.practicum.evmsevice.model.Category;
 
 public class CategoryMapper {
-    private CategoryMapper() {}
+    private CategoryMapper() {
+    }
 
     public static Category toCategory(NewCategoryDto dto) {
         Category category = new Category();

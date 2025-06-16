@@ -8,7 +8,8 @@ import ru.practicum.evmsevice.model.Compilation;
 import java.util.List;
 
 public class CompilationMapper {
-    private CompilationMapper() {}
+    private CompilationMapper() {
+    }
 
     public static Compilation toCompilation(NewCompilationDto dto) {
         Compilation c = new Compilation();
