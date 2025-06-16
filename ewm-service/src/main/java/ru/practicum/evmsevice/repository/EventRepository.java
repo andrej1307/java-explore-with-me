@@ -10,4 +10,6 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, Integer>,
                                             JpaSpecificationExecutor<Event> {
     List<Event> findEventsByInitiator_Id(int id);
+
+    List<Event> findEventsByIdIn(List<Integer> ids);
 }

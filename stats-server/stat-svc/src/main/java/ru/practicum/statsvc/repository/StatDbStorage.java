@@ -31,7 +31,7 @@ public class StatDbStorage implements StatStorage {
     }
 
     @Override
-    public EndpointHit addHit(EndpointHit hit) {
+    public void addHit(EndpointHit hit) {
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
         try {
             jdbc.update(SQL_INSERT_HIT,
@@ -49,8 +49,6 @@ public class StatDbStorage implements StatStorage {
         // получаем идентификатор
         final Integer hitId = generatedKeyHolder.getKey().intValue();
         hit.setId(hitId);
-
-        return hit;
     }
 
     @Override
@@ -94,10 +92,8 @@ public class StatDbStorage implements StatStorage {
             sql.append(" LIMIT :size");
         }
         try {
-            List<ViewStats> viewStatsList = jdbc.query(sql.toString(),
-                    parameters,
+            return jdbc.query(sql.toString(), parameters,
                     new ViewStatsRowMapper());
-            return viewStatsList;
         } catch (EmptyResultDataAccessException ignored) {
             return List.of();
         }

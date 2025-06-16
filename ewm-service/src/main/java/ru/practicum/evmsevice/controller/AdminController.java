@@ -15,6 +15,7 @@ import ru.practicum.evmsevice.model.Category;
 import ru.practicum.evmsevice.model.Event;
 import ru.practicum.evmsevice.model.User;
 import ru.practicum.evmsevice.service.CategoryService;
+import ru.practicum.evmsevice.service.CompilationService;
 import ru.practicum.evmsevice.service.EventService;
 import ru.practicum.evmsevice.service.UserService;
 
@@ -34,14 +35,27 @@ public class AdminController {
     private final UserService userService;
     private final CategoryService categoryService;
     private final EventService eventService;
+    private final CompilationService compilationService;
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getUsers(HttpServletRequest request) {
-        log.info("{} запрашивает список пользователей.", request.getRemoteUser());
+    public List<UserDto> getUsers(
+            @RequestParam(name = "ids", required = false) List<Integer> ids,
+            @RequestParam(name = "from", defaultValue = "0") Integer from,
+            @RequestParam(name = "size", defaultValue = "10") Integer size,
+            HttpServletRequest request) {
+        log.info("Администратор запрашивает  запрашивает список пользователей. {}", ids);
         statsClient.hitInfo(appName, request);
-        return userService.getUsers().stream()
+        List<User> users;
+        if (ids != null) {
+            users = userService.getUsers(ids);
+        } else {
+            users = userService.getUsers();
+        }
+        return users.stream()
                 .map(UserMapper::toUserDto)
+                .skip(from)
+                .limit(size)
                 .toList();
     }
 
@@ -64,7 +78,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(HttpServletRequest request, @PathVariable Integer id) {
         log.info("Удаляем пользователя {}", id);
         statsClient.hitInfo(appName, request);
@@ -121,8 +135,30 @@ public class AdminController {
     @PatchMapping("/events/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEvent(@PathVariable Integer eventId,
-                                    @RequestBody UpdateEventAdminRequest eventDto) {
-        log.info("Администратор модерирует событие id={}.", eventId);
+                                    @Validated @RequestBody UpdateEventAdminRequest eventDto) {
+        log.info("Администратор редактирует событие id={}. {}", eventId, eventDto);
         return eventService.adminUpdateEvent(eventId, eventDto);
+    }
+
+    @PostMapping("/compilations")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CompilationDto createCompilation(@Validated @RequestBody NewCompilationDto newCompilationDto) {
+        log.info("Администратор создает подборку событий \'{}\'.", newCompilationDto.getTitle());
+        return compilationService.createCompilation(newCompilationDto);
+    }
+
+    @PatchMapping("/compilations/{compId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CompilationDto updateCompilation(@PathVariable Integer compId,
+                                            @Validated @RequestBody PatchCompilationDto compilationDto) {
+        log.info("Администратор обновляет подборку событий \'{}\'.", compilationDto.getTitle());
+        return compilationService.patchCompilation(compId, compilationDto);
+    }
+
+    @DeleteMapping("/compilations/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCompilation(@PathVariable Integer compId) {
+        log.info("Администратор удаляет подборку событий id={}.", compId);
+        compilationService.deleteCompilation(compId);
     }
 }

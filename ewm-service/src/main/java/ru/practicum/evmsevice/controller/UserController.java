@@ -25,7 +25,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable int id,
                                     @Validated @RequestBody NewEventDto eventDto) {
-        log.info("Пользователь id={} cоздает новое событие: {}", id, eventDto.getTitle());
+        log.info("Пользователь id={} cоздает новое событие: {}", id, eventDto.toString());
         return eventService.createEvent(eventDto, id);
     }
 
@@ -52,9 +52,8 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEvent(@PathVariable Integer userId,
                                     @PathVariable Integer eventId,
-                                    @RequestBody UpdateEventUserRequest eventDto) {
-        log.info("Пользователь id={} изменяет информацию об инциированном событии id={}.",
-                userId, eventId);
+                                    @Validated @RequestBody UpdateEventUserRequest eventDto) {
+        log.info("Пользователь id={} изменяет информацию об инциированном событии. {}" , userId, eventDto.toString());
         return eventService.patchEvent(eventId, eventDto, userId);
     }
 
@@ -80,7 +79,7 @@ public class UserController {
         return requestService.updateRequestsStatus(userId, eventId, requestUpdateDto);
     }
 
-        @PostMapping("/{userId}/requests")
+    @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public RequestDto createRequest(@PathVariable Integer userId,
                                     @RequestParam(name = "eventId", required = true) Integer eventId) {
@@ -93,18 +92,15 @@ public class UserController {
     @GetMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.OK)
     public List<RequestDto> findRequestsByUserId(@PathVariable Integer userId) {
-        log.info("Пользователь id={} выполняет поиск собственных запросов.", userId);
-        return requestService.getRequestsByUserId(userId)
-                .stream()
-                .map(RequestMapper::toRequestDto)
-                .toList();
+        log.info("Пользователь id={} выполняет поиск собственных заявок.", userId);
+        return requestService.getRequestsByUserId(userId);
     }
 
-    @DeleteMapping("/{userId}/requests/{requestId}/cancel")
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
     @ResponseStatus(HttpStatus.OK)
-    public RequestDto deleteRequestById(@PathVariable Integer userId,
+    public RequestDto canceledRequestById(@PathVariable Integer userId,
                                         @PathVariable Integer requestId) {
-        log.info("Пользователь id={} удаляет запрос id={}.", userId, requestId);
-        return RequestMapper.toRequestDto(requestService.deleteRequest(userId, requestId));
+        log.info("Пользователь id={} отменяет запрос id={}.", userId, requestId);
+        return RequestMapper.toRequestDto(requestService.CanceledRequest(userId, requestId));
     }
 }

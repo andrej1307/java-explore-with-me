@@ -40,6 +40,9 @@ services:
       - stats-server
     environment:
       - STATSERVER_URL=http://stats-server:9090
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewmdb
+      - SPRING_DATASOURCE_USERNAME=ewmdb
+      - SPRING_DATASOURCE_PASSWORD=ewmdb
 
   ewm-db:
     image: postgres:16.1

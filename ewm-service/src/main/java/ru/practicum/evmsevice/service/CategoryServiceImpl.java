@@ -7,6 +7,8 @@ import ru.practicum.evmsevice.exception.NotFoundException;
 import ru.practicum.evmsevice.model.Category;
 import ru.practicum.evmsevice.repository.CategoryRepository;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -39,5 +41,10 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Не найдена категория id=" + id));
         return category;
+    }
+
+    @Override
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
     }
 }

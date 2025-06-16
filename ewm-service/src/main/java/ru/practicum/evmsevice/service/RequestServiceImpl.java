@@ -3,6 +3,7 @@ package ru.practicum.evmsevice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.evmsevice.dto.RequestDto;
 import ru.practicum.evmsevice.dto.RequestGroupDto;
 import ru.practicum.evmsevice.dto.RequestUpdateDto;
 import ru.practicum.evmsevice.enums.EventState;
@@ -32,23 +33,23 @@ public class RequestServiceImpl implements RequestService {
     public Request createRequest(Integer userId, Integer eventId) {
         Event event = eventService.findEventById(eventId);
         if (event.getInitiator().getId().equals(userId)) {
-            throw new ValidationException(
+            throw new DataConflictException(
                     "Field: event.initiator_id. Error: " +
                             "Инициатор события не может добавить запрос на участие в своём событии. " +
                             "Value: " + event.getInitiator().getId()
             );
         }
         if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ValidationException(
+            throw new DataConflictException(
                     "Field: event.state. Error: " +
                             "Нельзя участвовать в неопубликованном событии. " +
                             "Value: " + event.getState()
             );
         }
-        Integer confirmedRequests = requestRepository.getCountConfirmedRequestsByEventId(eventId);
-        if (confirmedRequests != null) {
+        Integer confirmedRequests = event.getConfirmedRequests();
+        if (confirmedRequests != null && event.getParticipantLimit() > 0) {
             if (confirmedRequests.equals(event.getParticipantLimit())) {
-                throw new ValidationException(
+                throw new DataConflictException(
                         "Field: event.state. Error: " +
                                 "У события достигнут лимит запросов на участие. " +
                                 "Value: " + confirmedRequests
@@ -60,7 +61,7 @@ public class RequestServiceImpl implements RequestService {
         request.setRequester(user);
         request.setEvent(event);
         request.setStatus(RequestStatus.PENDING);
-        if (!event.getRequestModeration()) {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
         }
         request.setCreated(LocalDateTime.now());
@@ -68,24 +69,28 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getRequestsByUserId(Integer userId) {
-        return requestRepository.findAllByRequester_Id(userId);
+    public List<RequestDto> getRequestsByUserId(Integer userId) {
+        List<Request> requests = requestRepository.findAllByRequester_Id(userId);
+        if (requests.isEmpty()) {
+            return List.of();
+        }
+        return requests.stream().map(RequestMapper::toRequestDto).toList();
     }
 
     @Override
-    public Request deleteRequest(Integer userId, Integer requestId) {
+    public Request CanceledRequest(Integer userId, Integer requestId) {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() ->
                         new NotFoundException("Не найден запрос id=" + requestId));
         if (!request.getRequester().getId().equals(userId)) {
             throw new ValidationException(
                     "Field: request.requester.id. Error: " +
-                            "Нельзя удалить чужой запрос. " +
+                            "Нельзя отменить чужой запрос. " +
                             "Value: " + request.getRequester().getId()
             );
         }
-        requestRepository.delete(request);
-        return request;
+        request.setStatus(RequestStatus.CANCELED);
+        return requestRepository.save(request);
     }
 
     /**

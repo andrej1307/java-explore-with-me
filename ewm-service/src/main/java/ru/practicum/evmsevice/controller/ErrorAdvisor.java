@@ -4,19 +4,22 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.evmsevice.dto.ApiError;
-import ru.practicum.evmsevice.exception.DataConflictException;
-import ru.practicum.evmsevice.exception.InternalServerException;
-import ru.practicum.evmsevice.exception.NotFoundException;
-import ru.practicum.evmsevice.exception.ValidationException;
+import ru.practicum.evmsevice.exception.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +28,17 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class ErrorAdvisor {
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError onHandlerMethodValidationException(BadRequestException e) {
+        log.error("400 {}.", e.getMessage());
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.BAD_REQUEST);
+        apiError.setReason("Запрос составлен некорректно.");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
+    }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -73,7 +87,6 @@ public class ErrorAdvisor {
         apiError.setTimestamp(LocalDateTime.now());
         return apiError;
     }
-
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -141,7 +154,7 @@ public class ErrorAdvisor {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleException(final Exception e) {
-        log.error("Error", e);
+        log.error("500 INTERNAL_SERVER_ERROR", e);
         ApiError apiError = new ApiError();
         apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         apiError.setReason(e.getCause().getMessage());

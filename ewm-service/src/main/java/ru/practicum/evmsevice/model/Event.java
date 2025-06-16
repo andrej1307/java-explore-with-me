@@ -1,5 +1,6 @@
 package ru.practicum.evmsevice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 import ru.practicum.evmsevice.enums.EventState;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Setter
@@ -48,4 +51,8 @@ public class Event {
     private EventState state;
     @Column(name = "title")
     private String title;
+    @Transient
+    private Integer confirmedRequests;
+    @Transient
+    private Integer views;
 }

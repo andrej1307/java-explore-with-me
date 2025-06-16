@@ -28,12 +28,14 @@ public class EventMapper {
         if(newDto.getParticipantLimit() != null) {
             event.setParticipantLimit(newDto.getParticipantLimit());
         }
-        event.setRequestModeration(false);
+        event.setRequestModeration(true);
         if (newDto.getRequestModeration() != null) {
             event.setRequestModeration(newDto.getRequestModeration());
         }
         event.setState(EventState.PENDING);
         event.setTitle(newDto.getTitle());
+        event.setConfirmedRequests(0);
+        event.setViews(0);
         return event;
     }
 
@@ -57,7 +59,13 @@ public class EventMapper {
         dto.setPublishedOn(event.getPublishedOn());
         dto.setTitle(event.getTitle());
         dto.setConfirmedRequests(0);
+        if (event.getConfirmedRequests() != null) {
+            dto.setConfirmedRequests(event.getConfirmedRequests());
+        }
         dto.setViews(0);
+        if(event.getViews() != null) {
+            dto.setViews(event.getViews());
+        }
         return dto;
     }
 
@@ -74,8 +82,14 @@ public class EventMapper {
         if(event.getParticipantLimit() != null) {
             dto.setParticipantLimit(event.getParticipantLimit());
         }
-        dto.setConfirmedRequest(0);
+        dto.setConfirmedRequests(0);
+        if (event.getConfirmedRequests() != null) {
+            dto.setConfirmedRequests(event.getConfirmedRequests());
+        }
         dto.setViews(0);
+        if(event.getViews() != null) {
+            dto.setViews(event.getViews());
+        }
         return dto;
     }
 }

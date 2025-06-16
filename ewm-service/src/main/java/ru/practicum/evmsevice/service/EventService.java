@@ -35,4 +35,6 @@ public interface EventService {
                                          String rangeEnd,
                                          Integer from,
                                          Integer size);
+
+    List<Event> findEventsByIdIn(List<Integer> eventIds);
 }

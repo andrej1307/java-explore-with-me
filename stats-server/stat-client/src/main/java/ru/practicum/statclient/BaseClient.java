@@ -1,12 +1,12 @@
 package ru.practicum.statclient;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.statdto.StatsDto;
-import ru.practicum.statdto.StatsDtoList;
 
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class BaseClient {
 
     protected List<StatsDto> getStatsList(String path,
                                           Map<String, Object> parameters) {
-        StatsDtoList serverResponse = new StatsDtoList();
+        ResponseEntity<List<StatsDto>> serverResponse = null;
         try {
             if (parameters != null) {
                 StringBuilder stringParametrs = new StringBuilder(path);
@@ -82,12 +82,15 @@ public class BaseClient {
                     stringParametrs.append(key);
                     stringParametrs.append("}&");
                 }
-                serverResponse = rest.getForObject(stringParametrs.toString(), StatsDtoList.class, parameters);
+                serverResponse = rest.exchange(stringParametrs.toString(), HttpMethod.GET, null,
+                        new ParameterizedTypeReference<List<StatsDto>>() {
+                        }, parameters);
             }
         } catch (Exception e) {
             e.printStackTrace();
             return List.of();
         }
-        return serverResponse.getStatsDtos();
+        List<StatsDto> dtos = serverResponse.getBody();
+        return dtos;
     }
 }

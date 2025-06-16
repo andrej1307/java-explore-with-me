@@ -12,7 +12,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.statclient.BaseClient;
 import ru.practicum.statdto.HitDto;
 import ru.practicum.statdto.StatsDto;
-import ru.practicum.statdto.StatsDtoList;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,11 +19,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// class StatsDtoListTypeToken extends TypeToken<List<StatsDto>> {
+// }
+
 @Component
 public class StatsClient extends BaseClient {
     private static final String PREFIX_HIT = "/hit";
     private static final String PREFIX_STATS = "/stats";
     private static final String PREFIX_EVETS = "/events/";
+    // private static Gson gson = new GsonBuilder()
+    //        .setPrettyPrinting()
+    //       .create();
 
     @Autowired
     public StatsClient(@Value("${statserver.url}") String serverUrl, RestTemplateBuilder builder) {
@@ -52,6 +57,7 @@ public class StatsClient extends BaseClient {
         hitDto.setTimestamp(LocalDateTime.now());
         post(hitDto);
     }
+
 
     public Integer getEventViews(Integer eventId, Boolean unique) {
         Map<String, Object> parameters = Map.of("uris", PREFIX_EVETS + eventId,

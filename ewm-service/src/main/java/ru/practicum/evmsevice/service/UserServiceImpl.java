@@ -1,6 +1,7 @@
 package ru.practicum.evmsevice.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.evmsevice.exception.NotFoundException;
 import ru.practicum.evmsevice.model.User;
 import ru.practicum.evmsevice.repository.UserRepository;
@@ -8,6 +9,7 @@ import ru.practicum.evmsevice.repository.UserRepository;
 import java.util.List;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
@@ -24,6 +26,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public List<User> getUsers(List<Integer> ids) {
+        return userRepository.findAllById(ids);
     }
 
     @Override
