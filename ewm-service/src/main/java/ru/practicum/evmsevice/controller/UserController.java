@@ -53,7 +53,7 @@ public class UserController {
     public EventFullDto updateEvent(@PathVariable Integer userId,
                                     @PathVariable Integer eventId,
                                     @Validated @RequestBody UpdateEventUserRequest eventDto) {
-        log.info("Пользователь id={} изменяет информацию об инциированном событии. {}", userId, eventDto.toString());
+        log.info("Пользователь id={} изменяет информацию об инициированном событии. {}", userId, eventDto.toString());
         return eventService.patchEvent(eventId, eventDto, userId);
     }
 
