@@ -4,8 +4,6 @@ services:
     container_name: postgres-stat
     ports:
       - "5432:5432"
-    volumes:
-      - ./volumes/stat/postgres:/var/lib/postgresql/data/
     environment:
       - POSTGRES_PASSWORD=statdb
       - POSTGRES_USER=statdb
@@ -25,7 +23,7 @@ services:
     depends_on:
       - stats-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/statdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-stat:5432/statdb
       - SPRING_DATASOURCE_USERNAME=statdb
       - SPRING_DATASOURCE_PASSWORD=statdb
 
@@ -40,7 +38,7 @@ services:
       - stats-server
     environment:
       - STATSERVER_URL=http://stats-server:9090
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5434/ewmdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-ewm:5434/ewmdb
       - SPRING_DATASOURCE_USERNAME=ewmdb
       - SPRING_DATASOURCE_PASSWORD=ewmdb
 
@@ -49,8 +47,6 @@ services:
     container_name: postgres-ewm
     ports:
       - "5434:5432"
-    volumes:
-      - ./volumes/ewm/postgres:/var/lib/postgresql/data/
     environment:
       - POSTGRES_PASSWORD=ewmdb
       - POSTGRES_USER=ewmdb

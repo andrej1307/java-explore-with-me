@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping
 public class StatController {
-
     private final StatService statService;
 
     @PostMapping("/hit")
@@ -34,9 +33,6 @@ public class StatController {
             @RequestParam(defaultValue = "false") Boolean unique,
             @RequestParam(defaultValue = "10") Integer size) {
         log.info("Запрашивается информация о посещении эндпоинта {} с {} до {}.", uris, start, end);
-        List<StatsDto> statDtos = statService.getStats(start, end, uris, unique, size);
-        // StatsDtoList statsDtoList = new StatsDtoList();
-        // statsDtoList.setStatsDtos(statDtos);
-        return statDtos;
+        return statService.getStats(start, end, uris, unique, size);
     }
 }
