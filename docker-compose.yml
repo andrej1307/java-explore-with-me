@@ -1,6 +1,20 @@
+version: '3.1'
 services:
+  stats-server:
+    build: stats-server
+    image: stats-server
+    container_name: stats-server
+    ports:
+      - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/statdb
+      - SPRING_DATASOURCE_USERNAME=statdb
+      - SPRING_DATASOURCE_PASSWORD=statdb
+
   stats-db:
-    image: postgres:16.1
+    image: postgres:14-alpine
     container_name: postgres-stat
     ports:
       - "5432:5432"
@@ -14,19 +28,6 @@ services:
       interval: 5s
       retries: 10
 
-  stats-server:
-    build: stats-server
-    image: stats-server
-    container_name: stats-server
-    ports:
-      - "9090:9090"
-    depends_on:
-      - stats-db
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-stat:5432/statdb
-      - SPRING_DATASOURCE_USERNAME=statdb
-      - SPRING_DATASOURCE_PASSWORD=statdb
-
   ewm-service:
     build: ewm-service
     image: ewm-service
@@ -35,15 +36,14 @@ services:
       - "8080:8080"
     depends_on:
       - ewm-db
-      - stats-server
     environment:
-      - STATSERVER_URL=http://stats-server:9090
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-ewm:5434/ewmdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewmdb
       - SPRING_DATASOURCE_USERNAME=ewmdb
       - SPRING_DATASOURCE_PASSWORD=ewmdb
+      - STATSERVER_URL=http://stats-server:9090
 
   ewm-db:
-    image: postgres:16.1
+    image: postgres:14-alpine
     container_name: postgres-ewm
     ports:
       - "5434:5432"
@@ -56,4 +56,3 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
-
