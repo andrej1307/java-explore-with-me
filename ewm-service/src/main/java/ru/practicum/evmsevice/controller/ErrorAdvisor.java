@@ -14,7 +14,6 @@ import ru.practicum.evmsevice.exception.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Класс обработки исключений при обработке поступивших http запросов
@@ -99,16 +98,16 @@ public class ErrorAdvisor {
     public ApiError onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("400 {}.", e.getMessage());
         final List<String> violations = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> String.format("Field: %s. Error: %s. Value: \'%s\'. ",
+                .map(error -> String.format("Field: %s. Error: %s. Value: '%s'. ",
                         error.getField(),
                         error.getDefaultMessage(),
                         error.getRejectedValue()
                 ))
-                .collect(Collectors.toList());
+                .toList();
         ApiError apiError = new ApiError();
         apiError.setStatus(HttpStatus.BAD_REQUEST);
         apiError.setReason("Запрос сформирован некорректно.");
-        apiError.setMessage(violations.stream().collect(Collectors.joining()));
+        apiError.setMessage(String.join(" ", violations));
         apiError.setTimestamp(LocalDateTime.now());
         return apiError;
     }
@@ -119,16 +118,16 @@ public class ErrorAdvisor {
         log.error("400 {}.", e.getMessage());
         final List<String> violations = e.getConstraintViolations().stream()
                 .map(
-                        violation -> String.format("Field: %s. Error: %s. Value: \'%s\'. ",
+                        violation -> String.format("Field: %s. Error: %s. Value: '%s'. ",
                                 violation.getPropertyPath().toString(),
                                 violation.getMessage(),
                                 violation.getInvalidValue()
                         ))
-                .collect(Collectors.toList());
+                .toList();
         ApiError apiError = new ApiError();
         apiError.setStatus(HttpStatus.BAD_REQUEST);
         apiError.setReason("Запрос сформирован некорректно.");
-        apiError.setMessage(violations.stream().collect(Collectors.joining()));
+        apiError.setMessage(String.join(" ", violations));
         apiError.setTimestamp(LocalDateTime.now());
         return apiError;
     }

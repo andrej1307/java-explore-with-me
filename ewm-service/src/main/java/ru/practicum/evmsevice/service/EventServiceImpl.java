@@ -50,7 +50,7 @@ public class EventServiceImpl implements EventService {
      * Создание нового события
      *
      * @param newEventDto - новое событие
-     * @param userId      - иденитификатор пользователя инициатора
+     * @param userId      - идентификатор пользователя инициатора
      * @return - сохраненный объект информации о событии
      */
     @Override
@@ -115,7 +115,7 @@ public class EventServiceImpl implements EventService {
      * @param events - список событий
      */
     private void updateViwesAndRequests(List<Event> events) {
-        TreeMap<Integer, Event> eventMap = new TreeMap<Integer, Event>();
+        TreeMap<Integer, Event> eventMap = new TreeMap<>();
         List<String> eventUris = new ArrayList<>();
         for (Event event : events) {
             eventMap.put(event.getId(), event);
@@ -225,12 +225,14 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() ->
                         new NotFoundException("Не найдено событие id=" + eventId));
-        if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(HOURS_EVENT_DELAY))) {
-            throw new ValidationException(
-                    "Field: eventDate. Error: не может быть раньше, чем через "
-                            + HOURS_EVENT_DELAY + " часа от текущего момента. Value: "
-                            + event.getEventDate().format(DATA_TIME_FORMATTER)
-            );
+        if (event.getEventDate() != null) {
+            if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(HOURS_EVENT_DELAY))) {
+                throw new ValidationException(
+                        "Field: eventDate. Error: не может быть раньше, чем через "
+                                + HOURS_EVENT_DELAY + " часа от текущего момента. Value: "
+                                + event.getEventDate().format(DATA_TIME_FORMATTER)
+                );
+            }
         }
         if (eventDto.getAnnotation() != null) {
             event.setAnnotation(eventDto.getAnnotation());
@@ -311,7 +313,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * поиск событий пользователем
+     * Поиск событий пользователем
      */
     @Override
     public List<EventShortDto> findEventsByParametrs(String text, List<Integer> categories,
@@ -337,7 +339,7 @@ public class EventServiceImpl implements EventService {
         if (startDate != null && endDate != null) {
             if (startDate.isAfter(endDate)) {
                 throw new BadRequestException(
-                        "Parametr: rangeStart, rangeEnd. " +
+                        "Parameter: rangeStart, rangeEnd. " +
                                 "Error: Введен некорректный интервал времени." +
                                 ". Value: " + startDate.format(DATA_TIME_FORMATTER) +
                                 ", " + endDate.format(DATA_TIME_FORMATTER)
@@ -357,7 +359,7 @@ public class EventServiceImpl implements EventService {
             spec = spec.and(EventSpecification.annotetionContains(text));
             spec = spec.or(EventSpecification.descriptionContains(text));
         }
-        // ... поиск по списку идентификаторов категорй
+        // ... поиск по списку идентификаторов категорий
         if (categories != null) {
             spec = spec.and(EventSpecification.categoryIn(categories));
         }
@@ -381,7 +383,7 @@ public class EventServiceImpl implements EventService {
         updateViwesAndRequests(events);
         List<EventShortDto> eventDtos;
         if (onlyAvailable) {
-            // Фильтруем события у котрых не исчерпано количество заявок
+            // Фильтруем события у которых не исчерпано количество заявок
             eventDtos = events.stream()
                     .filter(event -> event.getParticipantLimit() != 0
                             && event.getConfirmedRequests() < event.getParticipantLimit())
@@ -432,7 +434,7 @@ public class EventServiceImpl implements EventService {
         if (users != null) {
             spec = spec.and(EventSpecification.eventInitiatorIdIn(users));
         }
-        // ... поиск по списку идентификаторов категорй
+        // ... поиск по списку идентификаторов категорий
         if (categories != null) {
             spec = spec.and(EventSpecification.categoryIn(categories));
         }

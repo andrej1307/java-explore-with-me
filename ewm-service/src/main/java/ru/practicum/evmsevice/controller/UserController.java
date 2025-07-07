@@ -82,7 +82,7 @@ public class UserController {
     @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public RequestDto createRequest(@PathVariable Integer userId,
-                                    @RequestParam(name = "eventId", required = true) Integer eventId) {
+                                    @RequestParam(name = "eventId") Integer eventId) {
         log.info("Пользователь id={} создает запрос на участие в событии id={}.",
                 userId, eventId);
         Request request = requestService.createRequest(userId, eventId);

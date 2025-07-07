@@ -26,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping()
 public class PublicController {
-    private static final String RGEXP_DATE_TIME = "yyyy-MM-dd' 'HH:mm:ss";
     private final StatsClient statsClient;
     private final EventService eventService;
     private final CompilationService compilationService;
@@ -45,7 +44,7 @@ public class PublicController {
             throw new NotFoundException("Среди опубликованных не найдено событие id=" + id);
         }
         // сохраняем запрос в сервере статистики
-        statsClient.hitInfo(appName, request);
+        statsClient.hitInfo(appName, request.getRequestURI(), request.getRemoteAddr());
         return EventMapper.toFullDto(event);
     }
 
@@ -56,10 +55,8 @@ public class PublicController {
             @RequestParam(name = "categories", required = false) List<Integer> categories,
             @RequestParam(name = "paid", required = false) Boolean paid,
             @RequestParam(name = "rangeStart", required = false)
-            //@Valid @Pattern(regexp = RGEXP_DATE_TIME, message = "Не верный формат даты.")
             String rangeStart,
             @RequestParam(name = "rangeEnd", required = false)
-            //@Valid @Pattern(regexp = RGEXP_DATE_TIME, message = "Не верный формат даты.")
             String rangeEnd,
             @RequestParam(name = "onlyAvailable", defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(name = "sort", defaultValue = "EVENT_DATE") String sort,
@@ -70,7 +67,9 @@ public class PublicController {
                 text, categories, rangeStart, rangeEnd);
         List<EventShortDto> eventDtos = eventService.findEventsByParametrs(text, categories,
                 paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
-        statsClient.hitInfo(appName, request);
+        for (EventShortDto eventDto : eventDtos) {
+            statsClient.hitInfo(appName, String.format("/events/%d", eventDto.getId()), request.getRemoteAddr());
+        }
         return eventDtos;
     }
 

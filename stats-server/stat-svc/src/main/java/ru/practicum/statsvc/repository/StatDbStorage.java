@@ -54,39 +54,41 @@ public class StatDbStorage implements StatStorage {
     @Override
     public List<ViewStats> getViewStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique, Integer size) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT app, uri, count(ip) as hits FROM");
+        sql.append("SELECT e.app, e.uri, count(e.ip) as hits FROM");
         if (unique) {
-            sql.append(" (SELECT DISTINCT ON (ip, uri) app, uri, ip, timestamp FROM endpointhits)");
+            sql.append(" (SELECT DISTINCT ON (ip, uri) app, uri, ip, timestamp FROM endpointhits) AS e");
         } else {
-            sql.append(" endpointhits");
+            sql.append(" endpointhits AS e");
         }
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         Boolean whereFlag = false;
 
         if (uris != null && !uris.isEmpty()) {
-            sql.append(" WHERE uri IN (:uris)");
-            parameters.addValue("uris", uris);
-            whereFlag = true;
+            if (!uris.get(0).equalsIgnoreCase("/events")) {
+                sql.append(" WHERE e.uri IN (:uris)");
+                parameters.addValue("uris", uris);
+                whereFlag = true;
+            }
         }
 
         if (start != null) {
             if (whereFlag) {
-                sql.append(" AND timestamp >= :start");
+                sql.append(" AND e.timestamp >= :start");
             } else {
-                sql.append(" WHERE timestamp >= :start");
+                sql.append(" WHERE e.timestamp >= :start");
                 whereFlag = true;
             }
             parameters.addValue("start", start);
         }
         if (end != null) {
             if (whereFlag) {
-                sql.append(" AND timestamp < :end");
+                sql.append(" AND e.timestamp < :end");
             } else {
-                sql.append(" WHERE timestamp < :end");
+                sql.append(" WHERE e.timestamp < :end");
             }
             parameters.addValue("end", end);
         }
-        sql.append(" GROUP BY uri, app ORDER BY hits DESC");
+        sql.append(" GROUP BY e.uri, e.app ORDER BY hits DESC");
         if (size != null) {
             parameters.addValue("size", size);
             sql.append(" LIMIT :size");
