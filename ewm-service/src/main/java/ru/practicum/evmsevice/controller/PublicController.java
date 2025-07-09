@@ -7,13 +7,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.evmsevice.client.StatsClient;
+import ru.practicum.evmsevice.dto.CategoryDto;
 import ru.practicum.evmsevice.dto.CompilationDto;
 import ru.practicum.evmsevice.dto.EventFullDto;
 import ru.practicum.evmsevice.dto.EventShortDto;
 import ru.practicum.evmsevice.enums.EventState;
 import ru.practicum.evmsevice.exception.NotFoundException;
+import ru.practicum.evmsevice.mapper.CategoryMapper;
 import ru.practicum.evmsevice.mapper.EventMapper;
-import ru.practicum.evmsevice.model.Category;
 import ru.practicum.evmsevice.model.Event;
 import ru.practicum.evmsevice.service.CategoryService;
 import ru.practicum.evmsevice.service.CompilationService;
@@ -92,17 +93,19 @@ public class PublicController {
 
     @GetMapping("/categories")
     @ResponseStatus(HttpStatus.OK)
-    public List<Category> findCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
-                                         @RequestParam(name = "size", defaultValue = "10") Integer size) {
+    public List<CategoryDto> findCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
+                                            @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Пользователь запрашивает список категорий.");
-        return categoryService.getAllCategories().stream().skip(from).limit(size).toList();
+        return categoryService.getAllCategories().stream()
+                .map(CategoryMapper::toDto)
+                .skip(from).limit(size)
+                .toList();
     }
 
     @GetMapping("/categories/{catId}")
     @ResponseStatus(HttpStatus.OK)
-    public Category findCategoryById(@PathVariable("catId") int catId) {
+    public CategoryDto findCategoryById(@PathVariable("catId") int catId) {
         log.info("Пользователь запрашивает категорию id={}.", catId);
-        return categoryService.getCategoryById(catId);
+        return CategoryMapper.toDto(categoryService.getCategoryById(catId));
     }
-
 }

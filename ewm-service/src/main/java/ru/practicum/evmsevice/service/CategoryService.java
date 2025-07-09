@@ -1,13 +1,15 @@
 package ru.practicum.evmsevice.service;
 
+import ru.practicum.evmsevice.dto.CategoryDto;
+import ru.practicum.evmsevice.dto.NewCategoryDto;
 import ru.practicum.evmsevice.model.Category;
 
 import java.util.List;
 
 public interface CategoryService {
-    Category createCategory(Category category);
+    CategoryDto createCategory(NewCategoryDto categoryDto);
 
-    Category updateCategory(Category category);
+    CategoryDto updateCategory(Integer id, NewCategoryDto categoryDto);
 
     void deleteCategory(Integer id);
 

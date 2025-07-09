@@ -22,7 +22,6 @@ public class Compilation {
             joinColumns = {@JoinColumn(name = "compilation_id")},
             inverseJoinColumns = {@JoinColumn(name = "event_id")})
     private Set<Event> events = new HashSet<>();
-    //private List<Event> events = new ArrayList<>();
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "pinned", nullable = false)

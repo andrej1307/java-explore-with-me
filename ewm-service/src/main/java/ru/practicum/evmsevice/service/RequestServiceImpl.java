@@ -69,6 +69,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<RequestDto> getRequestsByUserId(Integer userId) {
         List<Request> requests = requestRepository.findAllByRequester_Id(userId);
         if (requests.isEmpty()) {
