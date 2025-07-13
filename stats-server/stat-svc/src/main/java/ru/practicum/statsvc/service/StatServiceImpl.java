@@ -1,6 +1,7 @@
 package ru.practicum.statsvc.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.statdto.HitDto;
 import ru.practicum.statdto.StatsDto;
 import ru.practicum.statsvc.exception.ValidationException;
@@ -14,6 +15,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
+@Transactional
 public class StatServiceImpl implements StatService {
     private static final DateTimeFormatter DATA_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final StatDbStorage storage;
@@ -38,9 +40,15 @@ public class StatServiceImpl implements StatService {
         try {
             if (startTxt != null && !startTxt.isEmpty()) {
                 start = LocalDateTime.parse(startTxt, DATA_TIME_FORMATTER);
+                if (endTxt == null) {
+                    throw new ValidationException("Отсутствует окончание временного периода.");
+                }
             }
             if (endTxt != null && !endTxt.isEmpty()) {
                 end = LocalDateTime.parse(endTxt, DATA_TIME_FORMATTER);
+                if (start == null) {
+                    throw new ValidationException("Отсутствует начало временного периода.");
+                }
             }
         } catch (DateTimeParseException e) {
             throw new ValidationException("Некорректный формат времени. " + e.getMessage());

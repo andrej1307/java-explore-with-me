@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping
 public class StatController {
-
     private final StatService statService;
 
     @PostMapping("/hit")

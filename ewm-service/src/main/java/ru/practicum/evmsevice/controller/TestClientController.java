@@ -30,7 +30,7 @@ public class TestClientController {
 
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getStats(
+    public String getStats(
             @RequestParam(required = false) String start,
             @RequestParam(required = false) String end,
             @RequestParam(required = false) String uris,
@@ -45,7 +45,7 @@ public class TestClientController {
         if (unique != null) parameters.put("unique", unique);
         if (size != null) parameters.put("size", size);
         ResponseEntity<Object> response = statsClient.get(parameters);
-        return response;
+        return response.getBody().toString();
     }
 }
 

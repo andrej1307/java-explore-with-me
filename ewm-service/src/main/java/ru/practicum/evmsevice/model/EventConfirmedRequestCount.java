@@ -1,4 +1,4 @@
-package ru.practicum.statsvc.model;
+package ru.practicum.evmsevice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ViewStats {
-    private String app;
-    private String uri;
-    private Integer hits;
+public class EventConfirmedRequestCount {
+    private Integer eventId;
+    private Long confirmedRequestCount;
 }
