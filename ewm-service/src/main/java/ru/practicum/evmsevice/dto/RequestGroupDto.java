@@ -13,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class RequestGroupDto {
-    List<RequestDto> confirmedRequests = new ArrayList<>();
-    List<RequestDto> rejectedRequests = new ArrayList<>();
+    private List<RequestDto> confirmedRequests = new ArrayList<>();
+    private List<RequestDto> rejectedRequests = new ArrayList<>();
 }
