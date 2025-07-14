@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.evmsevice.dto.*;
 import ru.practicum.evmsevice.mapper.RequestMapper;
 import ru.practicum.evmsevice.model.Request;
+import ru.practicum.evmsevice.service.CommentService;
 import ru.practicum.evmsevice.service.EventService;
 import ru.practicum.evmsevice.service.RequestService;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class UserController {
     private final EventService eventService;
     private final RequestService requestService;
+    private final CommentService commentService;
 
     @PostMapping("/{id}/events")
     @ResponseStatus(HttpStatus.CREATED)
@@ -102,5 +104,25 @@ public class UserController {
                                           @PathVariable Integer requestId) {
         log.info("Пользователь id={} отменяет запрос id={}.", userId, requestId);
         return RequestMapper.toRequestDto(requestService.canceledRequest(userId, requestId));
+    }
+
+    @PostMapping("/{userId}/events/{eventId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto addNewComment(@PathVariable Integer userId,
+                                    @PathVariable Integer eventId,
+                                    @RequestBody @Validated NewCommentDto commentDto) {
+        log.info("Пользователь id={} добавляет комментарий к событию id={}. {}",
+                userId, eventId, commentDto.toString());
+        return commentService.addComment(userId, eventId, commentDto);
+    }
+
+    @PatchMapping("/{userId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CommentDto updateComment(@PathVariable Integer userId,
+                                    @PathVariable Integer commentId,
+                                    @RequestBody @Validated NewCommentDto commentDto) {
+        log.info("Пользователь id={} редактирует комментарий id={}. {}",
+                userId, commentId, commentDto.toString());
+        return commentService.updateComment(userId, commentId, commentDto);
     }
 }
