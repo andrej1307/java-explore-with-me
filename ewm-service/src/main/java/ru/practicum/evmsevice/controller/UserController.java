@@ -106,23 +106,5 @@ public class UserController {
         return RequestMapper.toRequestDto(requestService.canceledRequest(userId, requestId));
     }
 
-    @PostMapping("/{userId}/events/{eventId}/comments")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CommentDto addNewComment(@PathVariable Integer userId,
-                                    @PathVariable Integer eventId,
-                                    @RequestBody @Validated NewCommentDto commentDto) {
-        log.info("Пользователь id={} добавляет комментарий к событию id={}. {}",
-                userId, eventId, commentDto.toString());
-        return commentService.addComment(userId, eventId, commentDto);
-    }
 
-    @PatchMapping("/{userId}/comments/{commentId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CommentDto updateComment(@PathVariable Integer userId,
-                                    @PathVariable Integer commentId,
-                                    @RequestBody @Validated NewCommentDto commentDto) {
-        log.info("Пользователь id={} редактирует комментарий id={}. {}",
-                userId, commentId, commentDto.toString());
-        return commentService.updateComment(userId, commentId, commentDto);
-    }
 }

@@ -12,7 +12,7 @@ public class CommentMapper {
 
     public static Comment getComment(NewCommentDto newCommemtDto) {
         Comment comment = new Comment();
-        comment.setCommentTime(LocalDateTime.now());
+        comment.setCreatedOn(LocalDateTime.now());
         comment.setText(newCommemtDto.getText());
         return comment;
     }
@@ -22,8 +22,8 @@ public class CommentMapper {
         commentDto.setId(comment.getId());
         commentDto.setEventId(comment.getEventId());
         commentDto.setText(comment.getText());
-        commentDto.setCommentTime(comment.getCommentTime());
-        commentDto.setEditTime(comment.getEditTime());
+        commentDto.setCreatedOn(comment.getCreatedOn());
+        commentDto.setEditedOn(comment.getEditedOn());
         commentDto.setAuthor(UserMapper.toUserDto(comment.getAuthor()));
         return commentDto;
     }

@@ -11,4 +11,5 @@ public interface CommentService {
     CommentDto getCommentById(Integer commentId);
     List<CommentDto> getCommentsByEventId(Integer eventId);
     List<CommentDto> getCommentsByUserId(Integer userId);
+    void deleteComment(Integer userId, Integer commentId);
 }

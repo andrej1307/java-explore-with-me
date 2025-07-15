@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.evmsevice.dto.CommentDto;
 import ru.practicum.evmsevice.dto.NewCommentDto;
+import ru.practicum.evmsevice.exception.DataConflictException;
 import ru.practicum.evmsevice.exception.NotFoundException;
 import ru.practicum.evmsevice.exception.ValidationException;
 import ru.practicum.evmsevice.mapper.CommentMapper;
@@ -30,11 +31,11 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto addComment(Integer userId, Integer eventId, NewCommentDto commentDto) {
         User user = userService.getUserById(userId);
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Не надено событие id=" + eventId));
+                .orElseThrow(() -> new NotFoundException("Не найдено событие id=" + eventId));
         Comment comment = CommentMapper.getComment(commentDto);
         comment.setAuthor(user);
         comment.setEventId(eventId);
-        comment.setCommentTime(LocalDateTime.now());
+        comment.setCreatedOn(LocalDateTime.now());
         Comment savedComment = commentRepository.save(comment);
         return CommentMapper.toDto(savedComment);
     }
@@ -49,7 +50,7 @@ public class CommentServiceImpl implements CommentService {
             throw new ValidationException("Редактировать комментарий может только его автор.");
         }
         comment.setText(commentDto.getText());
-        comment.setEditTime(LocalDateTime.now());
+        comment.setEditedOn(LocalDateTime.now());
         Comment savedComment = commentRepository.save(comment);
         return CommentMapper.toDto(savedComment);
     }
@@ -63,11 +64,29 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> getCommentsByEventId(Integer eventId) {
-        return List.of();
+        return commentRepository.findAllByEventId(eventId).stream()
+                .map(CommentMapper::toDto)
+                .toList();
     }
 
     @Override
     public List<CommentDto> getCommentsByUserId(Integer userId) {
-        return List.of();
+        return commentRepository.findAllByAuthor_Id(userId).stream()
+                .map(CommentMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void deleteComment(Integer userId, Integer commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Не найден комментарий id=" + commentId));
+        if (!comment.getAuthor().getId().equals(userId)) {
+            throw new DataConflictException(String.format(
+                    "Пользователь id=%d не является автором комментария id=%d.",
+                    userId, commentId
+            ));
+        }
+        commentRepository.delete(comment);
     }
 }

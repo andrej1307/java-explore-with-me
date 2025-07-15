@@ -18,9 +18,9 @@ public class CommentDto {
     private Integer id;
     private UserDto author;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime commentTime;
+    private LocalDateTime createdOn;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime editTime;
+    private LocalDateTime editedOn;
     private Integer eventId;
     private String text;
 }

@@ -23,8 +23,8 @@ public class Comment {
     private Integer eventId;
     @Column(name = "text", nullable = false)
     private String text;
-    @Column(name = "comment_time", nullable = false)
-    private LocalDateTime commentTime;
-    @Column(name = "edit_time")
-    private LocalDateTime editTime;
+    @Column(name = "created_on", nullable = false)
+    private LocalDateTime createdOn;
+    @Column(name = "edited_on")
+    private LocalDateTime editedOn;
 }
