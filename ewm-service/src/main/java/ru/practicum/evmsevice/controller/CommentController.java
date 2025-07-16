@@ -40,16 +40,20 @@ public class CommentController {
 
     @GetMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<CommentDto> getCommentsByUserId(@PathVariable Integer userId) {
+    public List<CommentDto> getCommentsByUserId(@PathVariable Integer userId,
+                                                @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Поиск всех коментариев пользователя id={}.", userId);
-        return commentService.getCommentsByUserId(userId);
+        return commentService.getCommentsByUserId(userId, from, size);
     }
 
     @GetMapping("/events/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<CommentDto> getCommentsByEventId(@PathVariable Integer eventId) {
+    public List<CommentDto> getCommentsByEventId(@PathVariable Integer eventId,
+                                                 @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                 @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Поиск всех коментариев к событию id={}.", eventId);
-        return commentService.getCommentsByEventId(eventId);
+        return commentService.getCommentsByEventId(eventId, from, size);
     }
 
     @GetMapping("/{commentId}")

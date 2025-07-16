@@ -63,16 +63,20 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> getCommentsByEventId(Integer eventId) {
+    public List<CommentDto> getCommentsByEventId(Integer eventId, Integer from, Integer ize) {
         return commentRepository.findAllByEventId(eventId).stream()
                 .map(CommentMapper::toDto)
+                .skip(from)
+                .limit(ize)
                 .toList();
     }
 
     @Override
-    public List<CommentDto> getCommentsByUserId(Integer userId) {
+    public List<CommentDto> getCommentsByUserId(Integer userId, Integer from, Integer ize) {
         return commentRepository.findAllByAuthor_Id(userId).stream()
                 .map(CommentMapper::toDto)
+                .skip(from)
+                .limit(ize)
                 .toList();
     }
 
