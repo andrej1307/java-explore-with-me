@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.evmsevice.enums.CommentState;
+import ru.practicum.evmsevice.enums.EventState;
 
 import java.time.LocalDateTime;
 
@@ -27,4 +29,7 @@ public class Comment {
     private LocalDateTime createdOn;
     @Column(name = "edited_on")
     private LocalDateTime editedOn;
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    private CommentState state;
 }

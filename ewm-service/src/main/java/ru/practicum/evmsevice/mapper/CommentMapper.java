@@ -25,6 +25,7 @@ public class CommentMapper {
         commentDto.setCreatedOn(comment.getCreatedOn());
         commentDto.setEditedOn(comment.getEditedOn());
         commentDto.setAuthor(UserMapper.toUserDto(comment.getAuthor()));
+        commentDto.setState(comment.getState());
         return commentDto;
     }
 }

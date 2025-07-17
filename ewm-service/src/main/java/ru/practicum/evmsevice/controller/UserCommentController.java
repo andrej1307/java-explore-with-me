@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.evmsevice.dto.CommentDto;
+import ru.practicum.evmsevice.dto.CommentModerationDto;
+import ru.practicum.evmsevice.dto.CommentsGroupDto;
 import ru.practicum.evmsevice.dto.NewCommentDto;
 import ru.practicum.evmsevice.service.CommentService;
 
@@ -14,11 +16,11 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/comments")
-public class CommentController {
+@RequestMapping("/users")
+public class UserCommentController {
     private final CommentService commentService;
 
-    @PostMapping("/users/{userId}/events/{eventId}")
+    @PostMapping("/{userId}/events/{eventId}/comments")
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDto addNewComment(@PathVariable Integer userId,
                                     @PathVariable Integer eventId,
@@ -28,7 +30,7 @@ public class CommentController {
         return commentService.addComment(userId, eventId, commentDto);
     }
 
-    @PatchMapping("/users/{userId}/patch/{commentId}")
+    @PatchMapping("/{userId}/comments/{commentId}")
     @ResponseStatus(HttpStatus.OK)
     public CommentDto updateComment(@PathVariable Integer userId,
                                     @PathVariable Integer commentId,
@@ -38,7 +40,18 @@ public class CommentController {
         return commentService.updateComment(userId, commentId, commentDto);
     }
 
-    @GetMapping("/users/{userId}")
+    @PatchMapping("/{userId}/events/{eventId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentsGroupDto addNewComment(@PathVariable Integer userId,
+                                          @PathVariable Integer eventId,
+                                          @RequestBody CommentModerationDto cmModDto) {
+        log.info("Пользователь id={}модерирует комментарии к событию id={}. {}",
+                userId, eventId, cmModDto.toString());
+        return commentService.moderationComments(userId, eventId, cmModDto);
+    }
+
+
+    @GetMapping("/{userId}/comments")
     @ResponseStatus(HttpStatus.OK)
     public List<CommentDto> getCommentsByUserId(@PathVariable Integer userId,
                                                 @RequestParam(name = "from", defaultValue = "0") Integer from,
@@ -47,23 +60,8 @@ public class CommentController {
         return commentService.getCommentsByUserId(userId, from, size);
     }
 
-    @GetMapping("/events/{eventId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<CommentDto> getCommentsByEventId(@PathVariable Integer eventId,
-                                                 @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                                 @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Поиск всех коментариев к событию id={}.", eventId);
-        return commentService.getCommentsByEventId(eventId, from, size);
-    }
 
-    @GetMapping("/{commentId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CommentDto getComment(@PathVariable Integer commentId) {
-        log.info("Поиск коментария id={}.", commentId);
-        return commentService.getCommentById(commentId);
-    }
-
-    @DeleteMapping("/{commentId}/users/{userId}")
+    @DeleteMapping("/{userId}/comment/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(@PathVariable Integer commentId,
                               @PathVariable Integer userId) {

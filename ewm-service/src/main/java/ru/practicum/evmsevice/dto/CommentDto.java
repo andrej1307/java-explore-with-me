@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.evmsevice.enums.CommentState;
 
 import java.time.LocalDateTime;
 
@@ -23,4 +24,5 @@ public class CommentDto {
     private LocalDateTime editedOn;
     private Integer eventId;
     private String text;
+    private CommentState state;
 }

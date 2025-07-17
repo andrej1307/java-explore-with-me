@@ -1,0 +1,18 @@
+package ru.practicum.evmsevice.dto;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@ToString
+
+public class CommentsGroupDto {
+    private List<CommentDto> approvedComments = new ArrayList<>();
+    private List<CommentDto> rejectedComments = new ArrayList<>();
+}

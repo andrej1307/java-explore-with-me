@@ -74,8 +74,9 @@ CREATE TABLE IF NOT EXISTS comments
     author_id   INTEGER                                  NOT NULL,
     event_id    INTEGER                                  NOT NULL,
     text        VARCHAR(2000)                            NOT NULL,
+    state       VARCHAR(20)                              NOT NULL,
     created_on TIMESTAMP WITHOUT TIME ZONE,
     edited_on TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_comment PRIMARY KEY (id),
     CONSTRAINT fk_event_for_comment FOREIGN KEY (event_id) REFERENCES events (id)
-););
+);
