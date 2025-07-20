@@ -41,7 +41,7 @@ public class UserCommentController {
     }
 
     @PatchMapping("/{userId}/events/{eventId}/comments")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public CommentsGroupDto addNewComment(@PathVariable Integer userId,
                                           @PathVariable Integer eventId,
                                           @RequestBody CommentModerationDto cmModDto) {
@@ -56,7 +56,7 @@ public class UserCommentController {
     public List<CommentDto> getCommentsByUserId(@PathVariable Integer userId,
                                                 @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                 @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Поиск всех коментариев пользователя id={}.", userId);
+        log.info("Поиск всех комментариев пользователя id={}.", userId);
         return commentService.getCommentsByUserId(userId, from, size);
     }
 

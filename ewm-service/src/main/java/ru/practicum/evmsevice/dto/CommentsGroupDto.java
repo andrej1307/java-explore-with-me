@@ -1,4 +1,5 @@
 package ru.practicum.evmsevice.dto;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.evmsevice.client.StatsClient;
 import ru.practicum.evmsevice.dto.*;
+import ru.practicum.evmsevice.enums.CommentState;
 import ru.practicum.evmsevice.enums.EventState;
 import ru.practicum.evmsevice.exception.NotFoundException;
 import ru.practicum.evmsevice.mapper.CategoryMapper;
@@ -111,10 +112,17 @@ public class PublicController {
     @GetMapping("/events/{eventId}/comments")
     @ResponseStatus(HttpStatus.OK)
     public List<CommentDto> getCommentsByEventId(@PathVariable Integer eventId,
+                                                 @RequestParam(name = "text", required = false) String text,
+                                                 @RequestParam(name = "authorIds", required = false) List<Integer> authorIds,
+                                                 @RequestParam(name = "rangeStart", required = false) String rangeStart,
+                                                 @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
+                                                 @RequestParam(name = "state", defaultValue = "APPROVED") String state,
+                                                 @RequestParam(name = "sort", defaultValue = "new") String sort,
                                                  @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        CommentState commentState = CommentState.from(state).orElse(CommentState.APPROVED);
         log.info("Поиск всех коментариев к событию id={}.", eventId);
-        return commentService.getCommentsByEventId(eventId, from, size);
+        return commentService.getCommentsByEventId(eventId, text, authorIds, rangeStart, rangeEnd, commentState, sort, from, size);
     }
 
     @GetMapping("/comments/{commentId}")
