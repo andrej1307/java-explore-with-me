@@ -45,7 +45,7 @@ public class UserCommentController {
     public CommentsGroupDto addNewComment(@PathVariable Integer userId,
                                           @PathVariable Integer eventId,
                                           @RequestBody CommentModerationDto cmModDto) {
-        log.info("Пользователь id={}модерирует комментарии к событию id={}. {}",
+        log.info("Пользователь id={} модерирует комментарии к событию id={}. {}",
                 userId, eventId, cmModDto.toString());
         return commentService.moderationComments(userId, eventId, cmModDto);
     }

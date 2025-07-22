@@ -8,91 +8,6 @@
   },
   "item": [
     {
-      "name": "Добавление нового пользователя",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
-              "    pm.response.to.be.success;  // код ответа должен быть 201 \r",
-              "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
-              "    pm.response.to.be.json;     // тело ответа должно быть в формате JSON\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "exec": [
-              "const main = async () => {\r",
-              "    const api = new API(pm);\r",
-              "    const rnd = new RandomUtils();\r",
-              "\r",
-              "    let user;\r",
-              "    try {\r",
-              "        user = rnd.getUser();\r",
-              "    } catch(err) {\r",
-              "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-              "    }\r",
-              "\r",
-              "    pm.request.body.update({\r",
-              "        mode: 'raw',\r",
-              "        raw: JSON.stringify(user),\r",
-              "        options: { raw: { language: 'json' } }\r",
-              "    });\r",
-              "};\r",
-              "\r",
-              "const interval = setInterval(() => {}, 1000);\r",
-              "\r",
-              "setTimeout(async () => \r",
-              "    {\r",
-              "        try {\r",
-              "            await main();\r",
-              "        } catch (e) {\r",
-              "            console.error(e);\r",
-              "        } finally {\r",
-              "            clearInterval(interval);\r",
-              "        }\r",
-              "    },  \r",
-              "    100 \r",
-              ");"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{{request_body}}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{baseUrl}}/admin/users",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "admin",
-            "users"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
       "name": "Добавление нового комментария к событию",
       "event": [
         {
@@ -241,7 +156,7 @@
               "        pm.collectionVariables.set(\"eid\", event.id)\r",
               "        // создаем объект автора комментария\r",
               "        const commentUser = await api.addUser(rnd.getUser());\r",
-              "        // создаем новый коментарий\r",
+              "        // создаем новый комментарий\r",
               "        comment = await api.addComment(commentUser.id, event.id, rnd.getComment());\r",
               "        // формируем тело запроса\r",
               "        pm.request.body.update({\r",
@@ -334,6 +249,231 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Поиск комментариев пользователя",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const main = async () => {\r",
+              "    const api = new API(pm);\r",
+              "    const rnd = new RandomUtils();\r",
+              "\r",
+              "    // Подготовка данных: Событие, инициатор события, автор комментария, комментарии\r",
+              "    try {\r",
+              "        const user = await api.addUser(rnd.getUser());\r",
+              "        const category = await api.addCategory(rnd.getCategory());\r",
+              "        let eventBody = rnd.getEvent(category.id);\r",
+              "        eventBody['requestModeration'] = true\r",
+              "        let event = await api.addEvent(user.id, eventBody);\r",
+              "        event = await api.publishEvent(event.id);\r",
+              "        // создаем объект автора комментария\r",
+              "        const commentUser = await api.addUser(rnd.getUser());\r",
+              "        // устанавливаем идентификатор автора в пути запроса\r",
+              "        pm.collectionVariables.set('uid', commentUser.id);\r",
+              "        // создаем новые комментарии\r",
+              "        comment1 = await api.addComment(commentUser.id, event.id, rnd.getComment());\r",
+              "        comment2 = await api.addComment(commentUser.id, event.id, rnd.getComment());\r",
+              "        // одобряем добавленные комментарии\r",
+              "        modComment = await api.approvedComment(user.id, event.id, comment1.id);\r",
+              "        modComment = await api.approvedComment(user.id, event.id, comment2.id);        \r",
+              "    } catch(err) {\r",
+              "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "const interval = setInterval(() => {}, 1000);\r",
+              "\r",
+              "setTimeout(async () => \r",
+              "    {\r",
+              "        try {\r",
+              "            // выполняем наш скрипт\r",
+              "            await main();\r",
+              "        } catch (e) {\r",
+              "            console.error(e);\r",
+              "        } finally {\r",
+              "            clearInterval(interval);\r",
+              "        }\r",
+              "    },  \r",
+              "    100 \r",
+              ");"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = pm.response.json();\r",
+              "pm.test(\"Тело ответа должно быть массивом и количество элементов больше 1\", function () {\r",
+              "    pm.response.to.be.ok;  // код ответа должен быть 200  \r",
+              "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
+              "    pm.response.to.be.json;     // тело ответа должно быть в формате JSON\r",
+              "    pm.expect(body).is.an('array'); // проверяем, что тело ответа является массивом \r",
+              "    pm.expect(body.length).to.be.gte(1); // длина массива должна быть больше 1\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            ":userId",
+            "comments"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "{{uid}}",
+              "description": "(Required) id текущего пользователя"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Поиск комментариев к заданному событию",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const main = async () => {\r",
+              "    const api = new API(pm);\r",
+              "    const rnd = new RandomUtils();\r",
+              "\r",
+              "    // Подготовка данных: Событие, инициатор события, автор комментария, комментарии\r",
+              "    try {\r",
+              "        const user = await api.addUser(rnd.getUser());\r",
+              "        const category = await api.addCategory(rnd.getCategory());\r",
+              "        let eventBody = rnd.getEvent(category.id);\r",
+              "        eventBody['requestModeration'] = true\r",
+              "        let event = await api.addEvent(user.id, eventBody);\r",
+              "        event = await api.publishEvent(event.id);\r",
+              "        // устанавливаем идентификатор события в пути запроса\r",
+              "        pm.collectionVariables.set('eid', event.id);\r",
+              "        comment1 = await api.addComment(user.id, event.id, rnd.getComment());\r",
+              "        modComment = await api.approvedComment(user.id, event.id, comment1.id);\r",
+              "        // создаем объект автора Дополнительного комментария\r",
+              "        const commentUser = await api.addUser(rnd.getUser());\r",
+              "        // устанавливаем идентификатор автора в пути запроса\r",
+              "        pm.collectionVariables.set('uid', commentUser.id);\r",
+              "        comment2 = await api.addComment(commentUser.id, event.id, rnd.getComment());\r",
+              "        modComment = await api.approvedComment(user.id, event.id, comment2.id);        \r",
+              "    } catch(err) {\r",
+              "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "const interval = setInterval(() => {}, 1000);\r",
+              "\r",
+              "setTimeout(async () => \r",
+              "    {\r",
+              "        try {\r",
+              "            // выполняем наш скрипт\r",
+              "            await main();\r",
+              "        } catch (e) {\r",
+              "            console.error(e);\r",
+              "        } finally {\r",
+              "            clearInterval(interval);\r",
+              "        }\r",
+              "    },  \r",
+              "    100 \r",
+              ");"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = pm.response.json();\r",
+              "pm.test(\"Тело ответа должно быть массивом и количество элементов больше 1\", function () {\r",
+              "    pm.response.to.be.ok;  // код ответа должен быть 200  \r",
+              "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
+              "    pm.response.to.be.json;     // тело ответа должно быть в формате JSON\r",
+              "    pm.expect(body).is.an('array'); // проверяем, что тело ответа является массивом \r",
+              "    pm.expect(body.length).to.be.gte(1); // длина массива должна быть больше 1\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{baseUrl}}/events/:eventId/comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            ":eventId",
+            "comments"
+          ],
+          "variable": [
+            {
+              "key": "eventId",
+              "value": "{{eid}}"
+            }
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "event": [
@@ -375,6 +515,10 @@
           "\r",
           "    async publishEvent(eventId, verbose=null) {\r",
           "        return this.patch('/admin/events/' + eventId, {stateAction: \"PUBLISH_EVENT\"}, \"Ошибка при публикации события\", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async approvedComment(userId, eventId, commentId,  verbose=null) {\r",
+          "        return this.patch(\"/users/\" + userId + \"/events/\" + eventId + \"/comments\", {commentIds: [commentId], state: \"APPROVED\"}, \"Ошибка при модерации комментария.\", verbose);\r",
           "    }\r",
           "    \r",
           "    async rejectEvent(eventId, verbose=null) {\r",
@@ -429,7 +573,7 @@
           "                this.pm.sendRequest(request, (error, response) => {\r",
           "                    if(error || (response.code >= 400 && response.code <= 599)) {\r",
           "                        let err = error ? error : JSON.stringify(response.json());\r",
-          "                        console.error(\"При выполнении запроса к серверу возникла ошика.\\n\", err,\r",
+          "                        console.error(\"При выполнении запроса к серверу возникла ошибка.\\n\", err,\r",
           "                             \"\\nДля отладки проблемы повторите такой же запрос к вашей программе \" + \r",
           "                             \"на локальном компьютере. Данные запроса:\\n\", JSON.stringify(request));\r",
           "\r",
@@ -543,10 +687,6 @@
     {
       "key": "id",
       "value": "1"
-    },
-    {
-      "key": "base_url",
-      "value": "https://postman-rest-api-learner.glitch.me/"
     },
     {
       "key": "baseUrl",
