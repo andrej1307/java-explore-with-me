@@ -61,7 +61,7 @@ public class UserCommentController {
     }
 
 
-    @DeleteMapping("/{userId}/comment/{commentId}")
+    @DeleteMapping("/{userId}/comments/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(@PathVariable Integer commentId,
                               @PathVariable Integer userId) {

@@ -121,7 +121,7 @@ public class PublicController {
                                                  @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
         CommentState commentState = CommentState.from(state).orElse(CommentState.APPROVED);
-        log.info("Поиск всех коментариев к событию id={}.", eventId);
+        log.info("Поиск коментариев к событию id={}.", eventId);
         return commentService.getCommentsByEventId(eventId, text, authorIds, rangeStart, rangeEnd, commentState, sort, from, size);
     }
 
