@@ -105,9 +105,9 @@
           "raw": "{{request_body}}"
         },
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/events/:eventId/comments",
+          "raw": "http://localhost:8080/users/:userId/events/:eventId/comments",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -224,9 +224,9 @@
           "raw": "{{request_body}}"
         },
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/events/:eventId/comments",
+          "raw": "http://localhost:8080/users/:userId/events/:eventId/comments",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -348,9 +348,9 @@
           "raw": "{{request_body}}"
         },
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/events/:eventId/comments",
+          "raw": "http://localhost:8080/users/:userId/events/:eventId/comments",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -468,9 +468,9 @@
           "raw": "{{request_body}}"
         },
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/events/:eventId/comments",
+          "raw": "http://localhost:8080/users/:userId/events/:eventId/comments",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -586,9 +586,9 @@
           "raw": "{{request_body}}"
         },
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/comments/:commentId",
+          "raw": "http://localhost:8080/users/:userId/comments/:commentId",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -702,9 +702,9 @@
           "raw": "{{request_body}}"
         },
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/events/:eventId/comments",
+          "raw": "http://localhost:8080/users/:userId/events/:eventId/comments",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -822,9 +822,9 @@
           "raw": ""
         },
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/comments",
+          "raw": "http://localhost:8080/users/:userId/comments",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -935,9 +935,9 @@
           "raw": ""
         },
         "url": {
-          "raw": "{{baseUrl}}/events/:eventId/comments",
+          "raw": "http://localhost:8080/events/:eventId/comments",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "events",
@@ -1053,9 +1053,9 @@
           "raw": ""
         },
         "url": {
-          "raw": "{{baseUrl}}/comments/:commentId",
+          "raw": "http://localhost:8080/comments/:commentId",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "comments",
@@ -1175,9 +1175,9 @@
           "raw": ""
         },
         "url": {
-          "raw": "{{baseUrl}}/events/:eventId/comments",
+          "raw": "http://localhost:8080/events/:eventId/comments",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "events",
@@ -1261,9 +1261,9 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/users/:userId/comments/:commentId",
+          "raw": "http://localhost:8080/users/:userId/comments/:commentId",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
