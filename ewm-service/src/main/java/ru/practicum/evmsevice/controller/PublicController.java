@@ -7,16 +7,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.evmsevice.client.StatsClient;
-import ru.practicum.evmsevice.dto.CategoryDto;
-import ru.practicum.evmsevice.dto.CompilationDto;
-import ru.practicum.evmsevice.dto.EventFullDto;
-import ru.practicum.evmsevice.dto.EventShortDto;
+import ru.practicum.evmsevice.dto.*;
+import ru.practicum.evmsevice.enums.CommentState;
 import ru.practicum.evmsevice.enums.EventState;
 import ru.practicum.evmsevice.exception.NotFoundException;
 import ru.practicum.evmsevice.mapper.CategoryMapper;
 import ru.practicum.evmsevice.mapper.EventMapper;
 import ru.practicum.evmsevice.model.Event;
 import ru.practicum.evmsevice.service.CategoryService;
+import ru.practicum.evmsevice.service.CommentService;
 import ru.practicum.evmsevice.service.CompilationService;
 import ru.practicum.evmsevice.service.EventService;
 
@@ -31,6 +30,7 @@ public class PublicController {
     private final EventService eventService;
     private final CompilationService compilationService;
     private final CategoryService categoryService;
+    private final CommentService commentService;
     @Value("${spring.application.name}")
     private String appName;
 
@@ -108,4 +108,28 @@ public class PublicController {
         log.info("Пользователь запрашивает категорию id={}.", catId);
         return CategoryMapper.toDto(categoryService.getCategoryById(catId));
     }
+
+    @GetMapping("/events/{eventId}/comments")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CommentDto> getCommentsByEventId(@PathVariable Integer eventId,
+                                                 @RequestParam(name = "text", required = false) String text,
+                                                 @RequestParam(name = "authorIds", required = false) List<Integer> authorIds,
+                                                 @RequestParam(name = "rangeStart", required = false) String rangeStart,
+                                                 @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
+                                                 @RequestParam(name = "state", defaultValue = "APPROVED") String state,
+                                                 @RequestParam(name = "sort", defaultValue = "new") String sort,
+                                                 @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                 @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        CommentState commentState = CommentState.from(state).orElse(CommentState.APPROVED);
+        log.info("Поиск коментариев к событию id={}.", eventId);
+        return commentService.getCommentsByEventId(eventId, text, authorIds, rangeStart, rangeEnd, commentState, sort, from, size);
+    }
+
+    @GetMapping("/comments/{commentId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CommentDto getComment(@PathVariable Integer commentId) {
+        log.info("Поиск коментария id={}.", commentId);
+        return commentService.getCommentById(commentId);
+    }
+
 }
