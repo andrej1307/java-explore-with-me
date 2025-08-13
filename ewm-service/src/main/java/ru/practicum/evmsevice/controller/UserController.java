@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.evmsevice.dto.*;
 import ru.practicum.evmsevice.mapper.RequestMapper;
 import ru.practicum.evmsevice.model.Request;
+import ru.practicum.evmsevice.service.CommentService;
 import ru.practicum.evmsevice.service.EventService;
 import ru.practicum.evmsevice.service.RequestService;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class UserController {
     private final EventService eventService;
     private final RequestService requestService;
+    private final CommentService commentService;
 
     @PostMapping("/{id}/events")
     @ResponseStatus(HttpStatus.CREATED)
@@ -103,4 +105,6 @@ public class UserController {
         log.info("Пользователь id={} отменяет запрос id={}.", userId, requestId);
         return RequestMapper.toRequestDto(requestService.canceledRequest(userId, requestId));
     }
+
+
 }
